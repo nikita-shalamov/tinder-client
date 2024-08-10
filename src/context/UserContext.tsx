@@ -9,6 +9,8 @@ interface UserContextProps {
     setIsAuthenticated: (authenticated: boolean) => void;
     loading: boolean;
     setLoading: (load: boolean) => void;
+    loadingFragment: boolean;
+    setLoadingFragment: (load: boolean) => void;
     userData: {
         telegramId: number | undefined;
         name: string;
@@ -31,6 +33,7 @@ interface UserContextProps {
     getMissingFields: () => void;
     missingFields: string[];
     userYear: number;
+    takeUserPhotosTelegram: (telegramId: number, limit: number) => void;
 }
 
 const userContext = createContext<UserContextProps | undefined>(undefined);
@@ -45,6 +48,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { request } = useHttp();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
     const [loading, setLoading] = useState(true);
+    const [loadingFragment, setLoadingFragment] = useState(undefined);
     const [isDataFetched, setIsDataFetched] = useState(false);
 
     const [userData, setUserData] = useState({
@@ -160,6 +164,45 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     };
 
+    const takeUserPhotosTelegram = async (telegramId: number, limit: number) => {
+        try {
+            setLoadingFragment(true);
+            // const response = await request(`/api/userPhotoTelegram`, "POST", { telegramId, limit });
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/userPhotoTelegram`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    telegramId: telegramId,
+                    limit: limit,
+                }),
+            });
+            setLoadingFragment(false);
+            const data = await response.json();
+            const files = data.files;
+
+            const fileObjects = files.map((file) => {
+                const binaryString = atob(file.data);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const blob = new Blob([bytes], { type: file.type });
+                return new File([blob], file.name, { type: file.type, lastModified: Date.now() });
+            });
+
+            fileObjects.map(async (item) => {
+                setUserPhotos((prevPhoto) => [...prevPhoto, item]);
+            });
+
+            return response;
+        } catch (e) {
+            console.log("Ошибка при получении фото юзера", (e as Error).message);
+        }
+    };
+
     const getMissingFields = () => {
         setMissingFields([]);
         if (typeof userData.name !== "string" || !userData.name.trim()) setMissingFields((prevData) => [...prevData, "Имя"]);
@@ -192,6 +235,9 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 getMissingFields,
                 missingFields,
                 userYear,
+                takeUserPhotosTelegram,
+                loadingFragment,
+                setLoadingFragment,
             }}
         >
             {children}

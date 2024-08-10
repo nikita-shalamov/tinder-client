@@ -1,6 +1,7 @@
 import { Alert } from "antd";
 import { useState, ChangeEvent, useEffect } from "react";
 import { useUserContext } from "../../context/UserContext";
+import Loading from "../../pages/Loading";
 
 interface AddPhotosProps {
     header?: boolean;
@@ -8,7 +9,7 @@ interface AddPhotosProps {
 
 export default function AddPhotos({ header = true }: AddPhotosProps) {
     const [photoCounter, setPhotoCounter] = useState(0);
-    const { userPhotos, setUserPhotos } = useUserContext();
+    const { userPhotos, setUserPhotos, takeUserPhotosTelegram, userData, loadingFragment } = useUserContext();
 
     useEffect(() => {
         setPhotoCounter(userPhotos.length);
@@ -48,6 +49,19 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
         );
     };
 
+    const onChangePhotoTelegram = () => {
+        let limit = 0;
+        if (photoCounter >= 9) {
+            console.log("limit if", photoCounter);
+            limit = 0;
+        } else {
+            console.log("limit else", 9 - photoCounter);
+
+            limit = 9 - photoCounter;
+        }
+        takeUserPhotosTelegram(userData.telegramId, limit);
+    };
+
     const [alert, setAlert] = useState<string | undefined>(undefined);
 
     const onChangeAlertError = () => {
@@ -55,12 +69,23 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
         setTimeout(() => setAlert(undefined), 2500);
     };
 
+    if (loadingFragment) {
+        return (
+            <div className="add-photos" style={{ height: "calc(100vh - 150px)" }}>
+                <Loading />
+            </div>
+        );
+    }
+
     return (
         <div className="add-photos">
             <div className="add-photos__wrapper">
                 {alert && <Alert style={{ position: "absolute", right: "20px", zIndex: "100" }} message={alert} type="error" showIcon />}
                 <div className="add-photos__header" style={header ? {} : { display: "none" }}>
                     <h2 className="add-photos__title">Фотографии</h2>
+                    <button className="add-photos__download" onClick={onChangePhotoTelegram}>
+                        Загрузить из телеграма
+                    </button>
                 </div>
                 <div className="add-photos__list">
                     {userPhotos &&

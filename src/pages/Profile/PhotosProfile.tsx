@@ -28,7 +28,7 @@ const PhotosProfile = () => {
     return (
         <>
             {alert && <Alert style={{ position: "fixed", right: "20px", top: 20, zIndex: 100, width: "calc(100% - 30px)" }} message={alert} type="error" showIcon />}
-            <AddPhotos header={false} />
+            <AddPhotos header={true} />
             <SaveButton extraClass={"add-photos__button_save"} onClick={onChangeSave} />
         </>
     );

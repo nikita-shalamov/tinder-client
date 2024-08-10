@@ -1,15 +1,14 @@
-import { Routes, Route, useLocation, Outlet, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Onboarding from "./pages/Onboarding";
 import Home from "./pages/Home";
 import ProfileRoutes from "./routes/ProfileRoutes";
 import ChatsRoutes from "./routes/ChatsRoutes";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useUserData from "./hooks/userData.hook";
 import LayoutWithNavbar from "./components/LayoutWithNavbar/LayoutWithNavbar";
 import Error from "./pages/Error";
 import Loading from "./pages/Loading";
 import { useUserContext } from "./context/UserContext";
-import useRegisterData from "./hooks/userData/registerData.hook";
 import TestPage from "./pages/TestPage";
 
 function ensureDocumentIsScrollable() {
@@ -40,8 +39,8 @@ export default function App() {
             takeUserData(Number(userId.id));
             takeUserPhotos(Number(userId.id));
         } else {
-            takeUserData(4);
-            takeUserPhotos(4);
+            takeUserData(7);
+            takeUserPhotos(7);
         }
     }, [userId.id]);
 
