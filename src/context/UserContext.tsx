@@ -75,7 +75,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const takeUserData = async (telegramId: number) => {
         try {
-            const response = await request("/api/takeUserData", "POST", { telegramId });
+            const response = await request("/takeUserData", "POST", { telegramId });
             const { name, birthDate, sex, city, description, interests } = response.message;
 
             onChangeUserData({ telegramId: telegramId, name, birthDate, sex, city, description, interests });
@@ -89,7 +89,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const pushUserData = async () => {
         try {
-            const response = await request("/api/pushUserData", "POST", userData);
+            const response = await request("/pushUserData", "POST", userData);
             return response;
         } catch (e) {
             console.log("Ошибка при регистрации пользователя", (e as Error).message);
@@ -98,7 +98,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const changeUserData = async () => {
         try {
-            const response = await request("/api/changeUserData", "POST", { updateData: userData });
+            const response = await request("/changeUserData", "POST", { updateData: userData });
             return response;
         } catch (e) {
             console.log("Ошибка при изменении данных юзера", (e as Error).message);
@@ -124,11 +124,11 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const takeUserPhotos = async (telegramId: number) => {
         try {
-            const response = await request(`/api/userPhotos`, "POST", { telegramId });
+            const response = await request(`/userPhotos`, "POST", { telegramId });
             setUserPhotos([]);
 
             response.photos.map(async (item: string) => {
-                const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/api/download/${item}`, item);
+                const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${item}`, item);
                 setUserPhotos((prevPhoto) => [...prevPhoto, imageFile]);
             });
 
@@ -153,7 +153,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         try {
             console.log("formData", formData);
 
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/upload`, formData, {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/upload`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -168,7 +168,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         try {
             setLoadingFragment(true);
             // const response = await request(`/api/userPhotoTelegram`, "POST", { telegramId, limit });
-            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/userPhotoTelegram`, {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/userPhotoTelegram`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
