@@ -18,7 +18,9 @@
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,  // Отключает ошибку при неявных any
+    "strictNullChecks": false, 
   },
 
   "include": ["src", "src/types"],

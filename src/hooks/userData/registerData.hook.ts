@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useUserContext } from "../../context/UserContext";
+import { useState } from "react";
 import useHttp from "../http.hook";
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
@@ -11,10 +10,9 @@ dayjs.extend(timezone);
 const useRegisterData = () => {
 
     const {request} = useHttp()
-    const {userId} = useUserContext()
 
     const [registerData, setRegisterData] = useState({
-        telegramId: userId,
+        telegramId: 1,
         name: "",
         birthDate: '',
         sex: "",

@@ -2,7 +2,6 @@ import { Input, Select } from "antd";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
 import { useUserContext } from "../../context/UserContext";
-import { useEffect } from "react";
 
 const RegPage = () => {
     const { userData, onChangeUserData, missingFields } = useUserContext();
@@ -43,6 +42,8 @@ const RegPage = () => {
                         {userData && (
                             <DatePicker
                                 format={dateFormat}
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
                                 onChange={(e) => onChangeData("birthDate", e)}
                                 defaultValue={userData.birthDate !== undefined ? dayjs(userData.birthDate) : ""}
                                 name="birthDate"

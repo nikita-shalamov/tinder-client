@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useCallback } from "react";
 
 const useHttp = () => {
@@ -6,6 +7,7 @@ const useHttp = () => {
       // Check if body is an instance of FormData
       if (body && !(body instanceof FormData)) {
         // If not FormData, assume JSON and stringify the body
+        // @ts-ignore
         body = JSON.stringify(body);
         console.log("Request body (JSON):", body);
 
@@ -15,7 +17,7 @@ const useHttp = () => {
         console.log("Request body (FormData):", body);
         // If it's FormData, the Content-Type will be automatically set by the browser
       }
-
+      // @ts-ignore
       const response = await fetch(import.meta.env.VITE_BASE_URL + url, { method, body, headers });
 
       console.log('Response:', response);

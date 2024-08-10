@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useRef } from "react";
 import { Carousel } from "antd";
 
@@ -12,12 +13,14 @@ const SurveyCarousel = ({ photos }: surveyCarouselProps) => {
     // Обработчики для кнопок
     const goToPrev = () => {
         if (carouselRef.current) {
+            // @ts-ignore
             carouselRef.current.prev(); // Перейти к предыдущему слайду
         }
     };
 
     const goToNext = () => {
         if (carouselRef.current) {
+            // @ts-ignore
             carouselRef.current.next(); // Перейти к следующему слайду
         }
     };

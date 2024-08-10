@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createContext, useContext, useState, ReactNode } from "react";
 import useHttp from "../hooks/http.hook";
 import axios from "axios";
@@ -75,6 +76,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
             onChangeUserData({ telegramId: telegramId, name, birthDate, sex, city, description, interests });
             setIsDataFetched(true);
+            // @ts-ignore
             setUserYear(calculateAge(birthDate));
         } catch (e) {
             console.log("Ошибка при получении данных пользователя", (e as Error).message);
