@@ -1,0 +1,38 @@
+.button {
+    &__wrapper {
+        &_save {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+    &_next, &_save {
+        margin: 0 auto;
+        width: auto;
+        height: 50px;
+        border-radius: 10px;
+        background-color: #eaefff;
+        padding: 5px 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #363F72;
+        border: none;
+    }
+    &_save {
+        margin-top: 20px;
+    }
+    &_header-close {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #eaefff;
+        width: 50px;
+        height: 50px;
+        border: none;
+        border-radius: 10px;
+    }
+}

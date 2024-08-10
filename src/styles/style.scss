@@ -1,0 +1,115 @@
+@import '../components/Buttons/buttons.scss';
+@import '../components/Navbar/navbar.scss';
+@import '../components/StartPage/startPage.scss';
+@import '../components/RegPage/regPage.scss';
+@import '../components/AddPhotos/addPhotos.scss';
+@import '../components/AboutMe/aboutMe.scss';
+@import '../components/Interests/interests.scss';
+@import '../components/ProgressBar/progressBar.scss';
+@import '../components/MainButton/mainButton.scss';
+@import '../components/SurveyPicture/surveyPicture.scss';
+@import '../components/SurveyInfo/surveyInfo.scss';
+@import '../components/Header/header.scss';
+@import '../components/ChatsList/chatsList.scss';
+@import '../components/SettingsList/settingsList.scss';
+@import '../components/SettingsItem/settingsItem.scss';
+@import '../styles/pages/profile.scss';
+@import './pages/onboarding.scss';
+@import './pages/loading.scss';
+@import '../components/ChatHeader/chatHeader.scss';
+@import '../components/ChatItem/chatItem.scss';
+@import '../components/ChatMessages/chatMessages.scss';
+@import '../components/TestHomeAnket/div.scss';
+@import '../components/HeaderFilter/headerFilter.scss';
+
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100%;
+    background-color: #fff;
+    
+}
+
+#root {
+    overflow-y: scroll;
+}
+
+html {
+    height: 100%;
+}
+
+* {
+    font-family: "Nunito", sans-serif;
+    font-weight: 400;
+    box-sizing: border-box;
+}
+
+#root {
+    height: 100%;
+}
+
+button {
+    cursor: pointer;
+}
+
+.background {
+    height: 100%;
+    overflow: auto;
+    position: relative;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+        display: none;
+        }
+    &__wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+        position: relative;
+        overflow-y: scroll;
+        padding-bottom: 20px;
+    }
+    &_min {
+        height: calc(100% - 52px);
+    }
+}
+
+.ant-select {
+    padding: 0;
+    height: 50px !important;
+    border: none !important;
+    &-selector {
+        border-radius: 12px !important;
+        // border: 1px #7C8591 solid !important;
+        padding: 0 15px !important;
+    }
+    &-selection {
+        &-item {
+            font-size: 18px;
+            // color: rgba(0, 0, 0, 0.25);
+            color: #000;
+        }
+        &-placeholder {
+            font-size: 18px;
+            color: #000 !important;
+        }
+        &-search-input {
+            font-size: 18px;
+            &::placeholder {
+                font-size: 18px;
+            }
+        }
+    }
+    &-item {
+        &-option {
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            &-content {
+                font-size: 18px;
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+.div-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.div-block {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff0000;
+}

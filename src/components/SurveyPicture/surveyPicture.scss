@@ -1,0 +1,106 @@
+.survey-picture {
+    &__wrapper {
+        height: calc(100vh - 83px);
+        width: 100%;
+        padding: 0px 20px 86px 20px;
+        position: relative;
+
+    }
+    &__left-swipe, &__right-swipe, &__down-swipe {
+        position: absolute;
+        width: 70px;
+        height: 70px;
+        border-radius: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 12;
+        img {
+            width: 50%;
+        }
+    }
+    &__left-swipe {
+        border: #F3485B 3px solid;
+        left: 50px;
+        bottom: 126px;
+    }
+    &__right-swipe {
+        border: #199A6A 3px solid;
+        right: 50px;
+        bottom: 126px;
+        img {
+            width: 55%;
+        }
+    }
+    &__down-swipe {
+        width: 60px;
+        height: 60px;
+        border: #1B86F9 3px solid;
+        bottom: 116px;
+        left: 50%;
+        transform: translateX(-50%);
+        img {
+            width: 55%;
+        }
+    }
+    &__name {
+        font-size: 40px;
+        font-weight: 800;
+        position: absolute;
+        bottom: 206px;
+        left: 50px;
+        color: #fff;
+    }
+    &__slider {
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    &__carousel {
+        position: relative;
+    }
+    &__prev-button, &__next-button {
+        position: absolute;
+        width: 45%;
+        height: calc(100% - 86px);
+        z-index: 10;
+        border: none;
+        background-color: rgba(0,0,0,0);
+        top: 0;
+    }
+    &__prev-button {
+        left: 20px;
+    }
+    &__next-button {
+        right: 20px;
+    }
+    &__photo {
+        height: auto;
+        width: 100%;
+        object-fit: cover;
+    }
+    &__light {
+        width: calc(100% - 40px);
+        height: calc(100% - 86px);
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 10%, rgba(0, 0, 0, 0.4) 20%, rgba(255, 255, 255, 0.0) 30%, rgba(255, 255, 255, 0.0) 80%, rgba(0, 0, 0, 0.8) 100%);
+        position: absolute;
+        top: 0px;
+        left: 20px;
+        border-radius: 21px;
+    }
+}
+
+.ant-carousel {
+    height: 100%;
+    div {
+        height: 100%;
+    }
+    img {
+        height: 100%;
+        object-fit: cover;
+        margin: 0 auto;  
+    }
+}
+

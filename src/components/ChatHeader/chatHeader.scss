@@ -1,0 +1,61 @@
+.chat-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    background-color: #fff;
+    .col {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    &__wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 12px;
+        border-bottom: 1px #000 solid;
+    }
+    &__back {
+        display: block;
+        width: 35px;
+        height: 35px;
+        img {
+            width: 100%;
+        }
+    }
+    &__options {
+        border: none;
+        background: none;
+        width: 45px;
+        height: 45px;
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    &__person {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    &__avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+        overflow: hidden;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+    &__name {
+        font-size: 22px;
+        color: #000;
+    }
+}

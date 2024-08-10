@@ -1,0 +1,49 @@
+.survey-info {
+    margin-top: -50px;
+    &__wrapper {
+        padding: 20px;
+        border-top-right-radius: 15px;
+        border-top-left-radius: 15px;
+        border-top: 1px #000 solid;
+    }
+    &__subtitle {
+        font-size: 20px;
+        color: #21262E;
+        font-weight: 700;
+        margin: 0 auto;
+    }
+    &__card {
+        padding: 10px 0px;
+    }
+    &__name {
+        font-size: 30px;
+        color: #21262E;
+        font-weight: 800;
+        word-break: break-all;
+        hyphens: auto;
+    }
+    &__main-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    &__location {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        background-color: #ededed;
+        border-radius: 10px;
+        margin-top: 5px;
+        img {
+            width: 20px;
+            height: 20px;
+        }
+    }
+    &__descr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+}

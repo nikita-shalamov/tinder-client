@@ -1,0 +1,22 @@
+.progress-bar {
+    &__wrapper {
+        margin-top: 5px;
+        width: 100%;
+        height: auto;
+        padding: 5px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 5px;
+    }
+    &__line {
+        height: 4px;
+        width: 100%;
+        border-radius: 10px;
+        background-color: #e4e4e4;
+        &.active {
+            background-color: #117cff;
+            border: none;
+        }
+    }
+}

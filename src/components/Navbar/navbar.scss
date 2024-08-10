@@ -1,0 +1,42 @@
+.navbar {
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    &__wrapper {
+        padding: 5px 10px;
+        background-color: #fff;
+    }
+    &__list {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    &__message-new {
+        position: absolute;
+        top: 0;
+        right: 0;
+        text-align: center;
+        padding: 3px 4px 4px 4px;
+        height: 19.5px;
+        width: auto;
+        min-width: 19.5px;
+        border-radius: 25px;
+        background-color: #FA5672;
+        color: #fff;
+        font-size: 10px;
+    }
+    &__item {
+        width: 42px;
+        height: 42px;
+        position: relative;
+        img {
+            width: 100%;
+        }
+        &_profile {
+            border-radius: 100%;
+            overflow: hidden;
+        }
+    }
+}

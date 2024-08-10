@@ -1,0 +1,57 @@
+.reg-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    &__wrapper {
+        height: fit-content;
+        width: 90%;
+        margin: auto auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 5px 0 0px 0;
+    }
+    &__field {
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+        margin-top: 15px;
+    }
+    &__label {
+        font-size: 20px;
+        color: #21262E;
+        font-weight: 700;
+    }
+    &__input {
+        margin-top: 5px;
+        width: 100%;
+        height: 50px;
+        border-radius: 12px;
+        border: 1px #7C8591 solid;
+        background-color: #ffff;
+        color: #21262E;
+        font-size: 17px;
+        padding: 10px 15px;
+        &::placeholder {
+            font-size: 17px;
+        }
+        input {
+            &::placeholder {
+                font-size: 17px;
+            }
+        }
+    }
+    // &__button {
+    //     margin: 0 auto;
+    //     margin-top: 20px;
+    //     width: 100%;
+    //     height: 50px;
+    //     color: #fff;
+    //     font-weight: 700;
+    //     font-size: 24px;
+    //     border: none;
+    //     border-radius: 12px;
+    // }
+}
