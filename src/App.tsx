@@ -36,9 +36,12 @@ export default function App() {
     const userId = useUserData();
 
     useEffect(() => {
-        if (userId !== undefined) {
+        if (userId.id !== undefined) {
             takeUserData(Number(userId.id));
             takeUserPhotos(Number(userId.id));
+        } else {
+            takeUserData(4);
+            takeUserPhotos(4);
         }
     }, [userId.id]);
 
