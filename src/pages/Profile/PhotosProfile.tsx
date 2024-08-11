@@ -9,7 +9,7 @@ const PhotosProfile = () => {
     const { SaveButton } = Buttons;
     const navigate = useNavigate();
 
-    const { userData, onChangeUserData, pushUserPhotos, missingFields } = useUserContext();
+    const { userData, onChangeUserData, pushUserPhotos, missingFields, loading, setLoading } = useUserContext();
     const [alert, setAlert] = useState<string | undefined>(undefined);
     const onChangeAlertError = (message: string) => {
         setAlert(message);
@@ -20,8 +20,10 @@ const PhotosProfile = () => {
         if (missingFields.includes("Фотографии")) {
             onChangeAlertError(`Добавьте не менее 3-х фото`);
         } else {
+            setLoading(true);
             pushUserPhotos();
             navigate("/profile");
+            setLoading(false);
         }
     };
 

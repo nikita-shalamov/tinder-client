@@ -51,45 +51,49 @@ const resizeImage = (file) => {
         const image = new Image();
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        const targetSize = 0.2 * 1024 * 1024; // Целевой размер в байтах (0.2 MB)
 
         image.onload = () => {
-            let quality = 1.0; // Начальное значение качества
-            const width = image.width;
-            const height = image.height;
+            if (file.size > 300 * 1024 && file.size < 500 * 1024) {
+                canvas.width = image.width / 2; // Уменьшите размеры по вашему усмотрению
+                canvas.height = image.height / 2;
+                console.log("if 1", file);
+            }
+            if (file.size > 500 * 1024 && file.size < 1300 * 1024) {
+                canvas.width = image.width / 3; // Уменьшите размеры по вашему усмотрению
+                canvas.height = image.height / 3;
+                console.log("if 2", file);
+            }
+            if (file.size > 1300 * 1024 && file.size < 2500 * 1024) {
+                canvas.width = image.width / 4; // Уменьшите размеры по вашему усмотрению
+                canvas.height = image.height / 4;
+                console.log("if 3", file);
+            }
+            if (file.size > 2500 * 1024 && file.size < 3800 * 1024) {
+                canvas.width = image.width / 5; // Уменьшите размеры по вашему усмотрению
+                canvas.height = image.height / 5;
+                console.log("if 4", file);
+            }
+            if (file.size > 3800 * 1024 && file.size < 5 * 1024 * 1024) {
+                canvas.width = image.width / 6; // Уменьшите размеры по вашему усмотрению
+                canvas.height = image.height / 6;
+                console.log("if 5", file);
+            }
+            if (file.size < 350 * 1024) {
+                canvas.width = image.width / 1; // Уменьшите размеры по вашему усмотрению
+                canvas.height = image.height / 1;
+                console.log("if 6", file);
+            }
 
-            const resizeAndCheck = () => {
-                canvas.width = width;
-                canvas.height = height;
-
-                pica.resize(image, canvas)
-                    .then(() => pica.toBlob(canvas, file.type, quality))
-                    .then((blob) => {
-                        if (blob.size > targetSize && quality > 0.1) {
-                            quality -= 0.1; // Уменьшение качества
-                            resizeAndCheck(); // Попробовать снова с меньшим качеством
-                        } else {
-                            resolve(new File([blob], file.name, { type: file.type }));
-                        }
-                    })
-                    .catch(reject);
-            };
-
-            // Оценка размера изображения
-            const reader = new FileReader();
-            reader.onload = () => {
-                // @ts-ignore
-                image.src = reader.result;
-            };
-            reader.readAsDataURL(file);
-
-            // Начальная попытка с текущими размерами
-            resizeAndCheck();
+            pica.resize(image, canvas)
+                .then(() => pica.toBlob(canvas, file.type))
+                .then((blob) => {
+                    resolve(new File([blob], file.name, { type: file.type }));
+                })
+                .catch(reject);
         };
 
         image.onerror = reject;
 
-        // Чтение изображения
         const reader = new FileReader();
         reader.onload = () => {
             // @ts-ignore
