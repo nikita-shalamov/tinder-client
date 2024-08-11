@@ -51,20 +51,45 @@ const resizeImage = (file) => {
         const image = new Image();
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
+        const targetSize = 0.2 * 1024 * 1024; // Целевой размер в байтах (0.2 MB)
 
         image.onload = () => {
-            canvas.width = image.width / 2; // Уменьшите размеры по вашему усмотрению
-            canvas.height = image.height / 2;
-            pica.resize(image, canvas)
-                .then(() => pica.toBlob(canvas, file.type))
-                .then((blob) => {
-                    resolve(new File([blob], file.name, { type: file.type }));
-                })
-                .catch(reject);
+            let quality = 1.0; // Начальное значение качества
+            const width = image.width;
+            const height = image.height;
+
+            const resizeAndCheck = () => {
+                canvas.width = width;
+                canvas.height = height;
+
+                pica.resize(image, canvas)
+                    .then(() => pica.toBlob(canvas, file.type, quality))
+                    .then((blob) => {
+                        if (blob.size > targetSize && quality > 0.1) {
+                            quality -= 0.1; // Уменьшение качества
+                            resizeAndCheck(); // Попробовать снова с меньшим качеством
+                        } else {
+                            resolve(new File([blob], file.name, { type: file.type }));
+                        }
+                    })
+                    .catch(reject);
+            };
+
+            // Оценка размера изображения
+            const reader = new FileReader();
+            reader.onload = () => {
+                // @ts-ignore
+                image.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Начальная попытка с текущими размерами
+            resizeAndCheck();
         };
 
         image.onerror = reject;
 
+        // Чтение изображения
         const reader = new FileReader();
         reader.onload = () => {
             // @ts-ignore
