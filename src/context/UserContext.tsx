@@ -3,6 +3,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import useHttp from "../hooks/http.hook";
 import axios from "axios";
 import dayjs from "dayjs";
+import Pica from "pica";
 
 interface UserContextProps {
     isAuthenticated: boolean | undefined;
@@ -43,6 +44,35 @@ function calculateAge(birthdateString: string) {
     const today = dayjs();
     return today.diff(birthdate, "year");
 }
+
+const resizeImage = (file) => {
+    return new Promise((resolve, reject) => {
+        const pica = Pica();
+        const image = new Image();
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        image.onload = () => {
+            canvas.width = image.width / 2; // Уменьшите размеры по вашему усмотрению
+            canvas.height = image.height / 2;
+            pica.resize(image, canvas)
+                .then(() => pica.toBlob(canvas, file.type))
+                .then((blob) => {
+                    resolve(new File([blob], file.name, { type: file.type }));
+                })
+                .catch(reject);
+        };
+
+        image.onerror = reject;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            // @ts-ignore
+            image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+};
 
 const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { request } = useHttp();
@@ -139,11 +169,14 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     const pushUserPhotos = async () => {
+        const resizedFiles = await Promise.all(userPhotos.map(resizeImage));
+
         const formData = new FormData();
 
         // Добавляем файлы в formData
-        userPhotos.forEach((file) => {
+        resizedFiles.forEach((file) => {
             console.log(file); // Для отладки, убедитесь, что файл отображается правильно
+            // @ts-ignore
             formData.append("photos", file);
         });
 
