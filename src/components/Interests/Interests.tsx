@@ -23,7 +23,7 @@ export default function Interests({ profile = false, label, textAlignLeft, activ
         { label: "animals", name: "Животные", emoji: "🐾" },
         { label: "games", name: "Игры", emoji: "🎮" },
     ];
-    console.log(userData.interests);
+
     const items = interestsList.map((item, index) => {
         if (profile) {
             if (userData.interests.includes(item.label)) {

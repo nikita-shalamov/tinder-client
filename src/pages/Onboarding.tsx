@@ -28,7 +28,6 @@ export default function Onboarding() {
     };
 
     useEffect(() => {
-        console.log(userData, userPhotos);
         getMissingFields();
     }, [userData, userPhotos]);
 

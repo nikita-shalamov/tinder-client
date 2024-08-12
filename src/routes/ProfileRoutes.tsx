@@ -10,9 +10,7 @@ const ProfileRoutes = () => {
     const { userData, userPhotos, getMissingFields, missingFields } = useUserContext();
 
     useEffect(() => {
-        console.log(userData, userPhotos);
         getMissingFields();
-        console.log(missingFields);
     }, [userData, userPhotos]);
 
     return (

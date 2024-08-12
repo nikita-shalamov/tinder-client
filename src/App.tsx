@@ -61,8 +61,6 @@ export default function App() {
     }, [isDataFetched]);
 
     if (loading) {
-        console.log("loading true");
-
         return <Loading />;
     }
 

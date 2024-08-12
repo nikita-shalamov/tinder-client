@@ -4,6 +4,7 @@ import useHttp from "../hooks/http.hook";
 import axios from "axios";
 import dayjs from "dayjs";
 import Pica from "pica";
+import Compressor from "compressorjs";
 
 interface UserContextProps {
     isAuthenticated: boolean | undefined;
@@ -47,59 +48,44 @@ function calculateAge(birthdateString: string) {
 
 const resizeImage = (file) => {
     return new Promise((resolve, reject) => {
-        const pica = Pica();
-        const image = new Image();
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
+        // Проверяем размер файла
+        if (file.size <= 300 * 1024) {
+            // Если файл меньше 300 КБ, возвращаем его без изменений
+            console.log("without компресс");
 
-        image.onload = () => {
-            if (file.size > 300 * 1024 && file.size < 500 * 1024) {
-                canvas.width = image.width / 2; // Уменьшите размеры по вашему усмотрению
-                canvas.height = image.height / 2;
-                console.log("if 1", file);
-            }
-            if (file.size > 500 * 1024 && file.size < 1300 * 1024) {
-                canvas.width = image.width / 3; // Уменьшите размеры по вашему усмотрению
-                canvas.height = image.height / 3;
-                console.log("if 2", file);
-            }
-            if (file.size > 1300 * 1024 && file.size < 2500 * 1024) {
-                canvas.width = image.width / 4; // Уменьшите размеры по вашему усмотрению
-                canvas.height = image.height / 4;
-                console.log("if 3", file);
-            }
-            if (file.size > 2500 * 1024 && file.size < 3800 * 1024) {
-                canvas.width = image.width / 5; // Уменьшите размеры по вашему усмотрению
-                canvas.height = image.height / 5;
-                console.log("if 4", file);
-            }
-            if (file.size > 3800 * 1024 && file.size < 5 * 1024 * 1024) {
-                canvas.width = image.width / 6; // Уменьшите размеры по вашему усмотрению
-                canvas.height = image.height / 6;
-                console.log("if 5", file);
-            }
-            if (file.size < 350 * 1024) {
-                canvas.width = image.width / 1; // Уменьшите размеры по вашему усмотрению
-                canvas.height = image.height / 1;
-                console.log("if 6", file);
-            }
+            resolve(file);
+            return;
+        }
 
-            pica.resize(image, canvas)
-                .then(() => pica.toBlob(canvas, file.type))
-                .then((blob) => {
-                    resolve(new File([blob], file.name, { type: file.type }));
-                })
-                .catch(reject);
-        };
-
-        image.onerror = reject;
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            // @ts-ignore
-            image.src = reader.result;
-        };
-        reader.readAsDataURL(file);
+        new Compressor(file, {
+            quality: 0.9, // Установите качество сжатия (0-1)
+            maxWidth: 700, // Установите максимальную ширину
+            maxHeight: 700, // Установите максимальную высоту
+            success(result) {
+                // Проверяем размер файла после первой попытки сжатия
+                if (result.size > 400 * 1024) {
+                    console.log("доп компресс");
+                    // Уменьшаем качество, чтобы достичь требуемого размера
+                    new Compressor(result, {
+                        quality: 0.8,
+                        success(resizedBlob) {
+                            // Преобразуем Blob в File
+                            resolve(new File([resizedBlob], file.name, { type: resizedBlob.type }));
+                        },
+                        error(err) {
+                            reject(err);
+                        },
+                    });
+                } else {
+                    // Преобразуем Blob в File
+                    console.log("usual компресс");
+                    resolve(new File([result], file.name, { type: result.type }));
+                }
+            },
+            error(err) {
+                reject(err);
+            },
+        });
     });
 };
 

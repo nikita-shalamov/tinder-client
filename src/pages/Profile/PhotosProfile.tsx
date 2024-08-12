@@ -4,6 +4,7 @@ import Buttons from "../../components/Buttons/Buttons";
 import { useUserContext } from "../../context/UserContext";
 import { useState } from "react";
 import { Alert } from "antd";
+import { longFormatters } from "date-fns";
 
 const PhotosProfile = () => {
     const { SaveButton } = Buttons;
@@ -16,14 +17,20 @@ const PhotosProfile = () => {
         setTimeout(() => setAlert(undefined), 3000);
     };
 
-    const onChangeSave = () => {
+    const onChangeSave = async () => {
         if (missingFields.includes("Фотографии")) {
             onChangeAlertError(`Добавьте не менее 3-х фото`);
         } else {
             setLoading(true);
-            pushUserPhotos();
-            navigate("/profile");
-            setLoading(false);
+            const response = await pushUserPhotos();
+            if (response !== undefined) {
+                console.log(response);
+
+                navigate("/profile");
+                setLoading(false);
+            } else {
+                navigate("/error");
+            }
         }
     };
 

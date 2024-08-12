@@ -2,6 +2,7 @@ import { Alert } from "antd";
 import { useState, ChangeEvent, useEffect } from "react";
 import { useUserContext } from "../../context/UserContext";
 import Loading from "../../pages/Loading";
+import axios from "axios";
 
 interface AddPhotosProps {
     header?: boolean;
@@ -15,7 +16,7 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
         setPhotoCounter(userPhotos.length);
     }, [userPhotos]);
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
             const maxFileSize = 5 * 1024 * 1024;
@@ -106,4 +107,7 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
             </div>
         </div>
     );
+}
+function heic2any(arg0: { blob: File; toType: string }) {
+    throw new Error("Function not implemented.");
 }
