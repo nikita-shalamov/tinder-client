@@ -90,6 +90,19 @@
         left: 20px;
         border-radius: 21px;
     }
+    &__write-button {
+        background-color: #eaefff;
+        border-radius: 10px;
+        border: none;
+        padding: 10px 20px;
+        position: absolute;
+        bottom: 110px;
+        left: 50px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #363F72;
+        z-index: 11;
+    }
 }
 
 .ant-carousel {

@@ -1,37 +1,42 @@
-import dayjs from "dayjs";
-import { useUserContext } from "../../context/UserContext";
-import useUserData from "../../hooks/userData.hook";
 import Interests from "../Interests/Interests";
+import { Skeleton } from "antd";
 
 interface SurveyInfoProps {
     myRef: React.RefObject<HTMLDivElement>;
+    data: {
+        name: string;
+        year: number;
+        city: string;
+        description: string;
+        interests: string[];
+    };
 }
 
-const SurveyInfo: React.FC<SurveyInfoProps> = ({ myRef }) => {
-    const { userData, userYear } = useUserContext();
-
+const SurveyInfo: React.FC<SurveyInfoProps> = ({ myRef, data }) => {
     const cities = {
         perm: "Пермь",
         moscow: "Москва",
     };
+
     return (
         <div ref={myRef}>
             <div className="survey-info">
                 <div className="survey-info__wrapper">
                     <div className="survey-info__main-info">
                         <div className="survey-info__name">
-                            {userData.name}, {userYear}
+                            {!data || !data.name ? <Skeleton.Input active={true} size={"default"} /> : `${data.name}, ${data.year}`}
+                            {/* {data.name}, {data.year} */}
                         </div>
                         <div className="survey-info__location">
                             <img src="/images/icons/location.svg" alt="" />
-                            {cities[userData.city]}
+                            {cities[data.city]}
                         </div>
                     </div>
-                    <div className="survey-info__descr">{userData.description}</div>
+                    <div className="survey-info__descr">{data.description}</div>
                     <div className="survey-info__card">
                         <div className="survey-info__subtitle">Интересы</div>
                         <div className="survey-info__body">
-                            <Interests profile={true} label={false} textAlignLeft={true} active={false} />
+                            <Interests data={data} profile={true} label={false} textAlignLeft={true} active={false} />
                         </div>
                     </div>
                     {/* <div className="survey-info__card">

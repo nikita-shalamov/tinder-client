@@ -27,13 +27,7 @@ const SurveyCarousel = ({ photos }: surveyCarouselProps) => {
 
     return (
         <div style={{ height: "100%" }}>
-            <Carousel
-                dotPosition="top"
-                infinite={false}
-                style={{ height: "100%" }}
-                ref={carouselRef} // Присваиваем реф
-                className="survey-picture__carousel"
-            >
+            <Carousel dotPosition="top" infinite={false} style={{ height: "100%" }} ref={carouselRef} className="survey-picture__carousel">
                 {photos.map((item, index) => {
                     return (
                         <div key={index}>

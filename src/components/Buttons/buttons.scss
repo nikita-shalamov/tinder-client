@@ -35,4 +35,10 @@
         border: none;
         border-radius: 10px;
     }
+    &_back {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #eaefff;
+    }
 }

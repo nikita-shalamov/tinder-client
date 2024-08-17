@@ -20,11 +20,17 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
             const maxFileSize = 5 * 1024 * 1024;
+            const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+
+            if (!validTypes.includes(file.type)) {
+                onChangeAlertError("Неверный тип файла. Загрузите JPEG, JPG или PNG.");
+                return;
+            }
 
             if (file.size < maxFileSize) {
                 setUserPhotos([...userPhotos, file]);
             } else {
-                onChangeAlertError();
+                onChangeAlertError("Максимальный размер фото 5 MB");
             }
         }
     };
@@ -65,8 +71,8 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
 
     const [alert, setAlert] = useState<string | undefined>(undefined);
 
-    const onChangeAlertError = () => {
-        setAlert("Максимальный размер фото 5 MB");
+    const onChangeAlertError = (message: string) => {
+        setAlert(message);
         setTimeout(() => setAlert(undefined), 2500);
     };
 

@@ -29,7 +29,7 @@ export default function AboutMe() {
                     </form>
                 </div>
             </div>
-            <Interests label={true} />
+            <Interests data={userData} label={true} />
         </>
     );
 }

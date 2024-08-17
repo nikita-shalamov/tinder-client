@@ -8,6 +8,9 @@ export default function Navbar() {
                     <Link to="/home" className="navbar__item navbar__item_active">
                         <img src="/images/icons/heart.svg" alt="" className="navbar__icon" />
                     </Link>
+                    <Link to="/likes" className="navbar__item navbar__item_active">
+                        <img src="/images/icons/heart.svg" alt="" className="navbar__icon" />
+                    </Link>
                     <Link to="/chats" className="navbar__item">
                         <div className="navbar__message-new">123</div>
                         <img src="/images/icons/chats.svg" alt="" className="navbar__icon" />

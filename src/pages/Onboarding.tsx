@@ -15,12 +15,8 @@ export default function Onboarding() {
     const paths = ["start-page", "register", "add-photos", "about-me"];
 
     const { progress, increaseProgress, decreaseProgress } = useProgress();
-
-    const { pushUserData, userData, userPhotos, pushUserPhotos, getMissingFields, missingFields, loading, setLoading } = useUserContext();
-
+    const { pushUserData, userData, userPhotos, pushUserPhotos, getMissingFields, missingFields, loading, setLoading, isDataFetched } = useUserContext();
     const [alert, setAlert] = useState<string | undefined>(undefined);
-
-    const [missFields, setMissFields] = useState([]);
 
     const onChangeAlertError = (message: string) => {
         setAlert(message);
@@ -57,7 +53,13 @@ export default function Onboarding() {
         if (location.pathname === "/onboarding" || location.pathname !== `/onboarding/${paths[progress]}`) {
             navigate(`/onboarding/${paths[progress]}`);
         }
-    }, [progress]);
+    }, [progress, userData]);
+
+    useEffect(() => {
+        if (isDataFetched && userData.name !== undefined) {
+            navigate("/home");
+        }
+    }, [isDataFetched]);
 
     return (
         <>

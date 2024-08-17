@@ -30,6 +30,15 @@ const CloseButton = ({ extraClass }: CloseButtonProps) => {
 const NextButton = () => {
     return <button className="button button_next">Дальше</button>;
 };
-const Buttons = { SaveButton, NextButton, CloseButton };
+
+const BackButton = () => {
+    return (
+        <button className="button button_back">
+            <img src="images/icons/arrow-left.svg" alt="" />
+        </button>
+    );
+};
+
+const Buttons = { SaveButton, NextButton, CloseButton, BackButton };
 
 export default Buttons;

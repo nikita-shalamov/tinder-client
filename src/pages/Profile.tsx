@@ -11,7 +11,6 @@ function calculateAge(birthdateString: string) {
 
 const Profile = () => {
     const { userData, userPhotos } = useUserContext();
-    console.log("profile userPhotos", userPhotos);
 
     return (
         <div className="profile">

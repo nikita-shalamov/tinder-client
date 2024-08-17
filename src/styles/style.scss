@@ -21,6 +21,9 @@
 @import '../components/ChatMessages/chatMessages.scss';
 @import '../components/TestHomeAnket/div.scss';
 @import '../components/HeaderFilter/headerFilter.scss';
+@import './pages/likes.scss';
+@import '../components/User/user.scss';
+@import '../components/Matches/matches.scss';
 
 body {
     margin: 0;
@@ -73,6 +76,11 @@ button {
     &_min {
         height: calc(100% - 52px);
     }
+}
+
+.ant-skeleton {
+    height: 100%;
+    width: 100% !important; 
 }
 
 .ant-select {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import useHttp from "../hooks/http.hook";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -30,12 +30,16 @@ interface UserContextProps {
     onChangeUserData: (newData: object) => void;
     isDataFetched: boolean;
     changeUserData: () => void;
-    takeUserPhotos: (telegramId: number) => void;
+    takeUserPhotos: (telegramId: number, set?: boolean) => void;
     pushUserPhotos: () => void;
     getMissingFields: () => void;
     missingFields: string[];
     userYear: number;
     takeUserPhotosTelegram: (telegramId: number, limit: number) => void;
+    getAllUserData: (telegramId: number) => void;
+    getMyLikes: (telegramId: number) => void;
+    getMinimizeUserData: (telegramId: number) => void;
+    getMatches: () => void;
 }
 
 const userContext = createContext<UserContextProps | undefined>(undefined);
@@ -132,6 +136,37 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     };
 
+    const getAllUserData = async (telegramId: number) => {
+        try {
+            const responseData = await request("/takeUserData", "POST", { telegramId });
+            const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
+            const { name, birthDate, sex, city, description, interests } = responseData.message;
+            const year = calculateAge(birthDate);
+
+            const photosUser: File[] = [];
+
+            for (const item of responsePhotos.photos) {
+                const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${item}`, item);
+                photosUser.push(imageFile);
+            }
+
+            return { name, birthDate, year, sex, city, description, interests, photos: photosUser };
+        } catch (e) {
+            console.log("Ошибка при получении данных пользователя", (e as Error).message);
+            return {}; // Возврат пустого объекта в случае ошибки
+        }
+    };
+
+    const getMinimizeUserData = async (telegramId: number) => {
+        const responseData = await request("/takeUserData", "POST", { telegramId });
+        const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
+        const { name, birthDate, sex, city, description, interests } = responseData.message;
+        const year = calculateAge(birthDate);
+
+        const userPhoto = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${responsePhotos.photos[0]}`, responsePhotos.photos[0]);
+        return { name, year, photo: userPhoto, telegramId };
+    };
+
     const pushUserData = async () => {
         try {
             const response = await request("/pushUserData", "POST", userData);
@@ -167,17 +202,30 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }
     };
 
-    const takeUserPhotos = async (telegramId: number) => {
+    const takeUserPhotos = async (telegramId: number, set = true) => {
         try {
             const response = await request(`/userPhotos`, "POST", { telegramId });
-            setUserPhotos([]);
 
-            response.photos.map(async (item: string) => {
-                const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${item}`, item);
-                setUserPhotos((prevPhoto) => [...prevPhoto, imageFile]);
-            });
+            if (set) {
+                setUserPhotos([]);
+            }
 
-            return response;
+            const downloadPhotos = await Promise.all(
+                response.photos.map(async (item: string) => {
+                    const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${item}`, item);
+                    if (set) {
+                        setUserPhotos((prevPhoto) => [...prevPhoto, imageFile]);
+                    } else {
+                        return imageFile;
+                    }
+                })
+            );
+
+            if (set) {
+                return response;
+            } else {
+                return downloadPhotos;
+            }
         } catch (e) {
             console.log("Ошибка при получении фото юзера", (e as Error).message);
         }
@@ -262,6 +310,70 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         if (userPhotos.length < 3) setMissingFields((prevData) => [...prevData, "Фотографии"]);
     };
 
+    const getMatches = async () => {
+        const getMatches = async () => {
+            if (userData && userData.telegramId) {
+                const response = await request(`/getMatches/${userData.telegramId}`);
+                return response.matches;
+            }
+        };
+
+        const matches = await getMatches();
+
+        const loadProfiles = async (matches) => {
+            const loadedProfiles = [];
+            for (const item of matches) {
+                let minimizeData;
+                if (item.toUser.telegramId === userData.telegramId) {
+                    minimizeData = await getMinimizeUserData(item.fromUser.telegramId);
+                } else {
+                    minimizeData = await getMinimizeUserData(item.toUser.telegramId);
+                }
+                loadedProfiles.push(minimizeData);
+            }
+            return loadedProfiles;
+        };
+
+        const matchesData = loadProfiles(matches);
+
+        return matchesData;
+    };
+
+    const getMyLikes = async () => {
+        const getMyLikes = async () => {
+            if (userData && userData.telegramId) {
+                const response = await request(`/getMyLikes/${userData.telegramId}`);
+
+                return response.likes;
+            }
+        };
+
+        const myLikes = await getMyLikes();
+
+        const loadLikes = async (myLikes) => {
+            const myLikesData = [];
+            for (const item of myLikes) {
+                console.log("item", item);
+                const userDataMin = await getMinimizeUserData(item.fromUser.telegramId);
+
+                myLikesData.push({
+                    id: userDataMin.telegramId,
+                    name: userDataMin.name,
+                    age: userDataMin.year,
+                    photo: userDataMin.photo,
+                });
+            }
+
+            return myLikesData;
+        };
+
+        console.log("myLikes", myLikes);
+
+        const likesData = await loadLikes(myLikes);
+
+        return likesData;
+    };
+
     return (
         <userContext.Provider
             value={{
@@ -286,6 +398,10 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 takeUserPhotosTelegram,
                 loadingFragment,
                 setLoadingFragment,
+                getAllUserData,
+                getMyLikes,
+                getMinimizeUserData,
+                getMatches,
             }}
         >
             {children}

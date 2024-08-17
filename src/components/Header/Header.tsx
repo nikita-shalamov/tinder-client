@@ -14,10 +14,8 @@ const Header = ({ title, close }: HeaderProps) => {
         const currentPath = location.pathname.replace(/\/$/, "");
         if (!currentPath.includes("/profile/photos")) {
             takeUserData(userData.telegramId);
-            console.log("closed data");
         } else {
             takeUserPhotos(userData.telegramId);
-            console.log("closed photos");
         }
     };
 

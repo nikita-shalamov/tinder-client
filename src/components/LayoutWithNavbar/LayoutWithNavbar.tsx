@@ -9,6 +9,7 @@ const LayoutWithNavbar = () => {
         "/home": "Анкеты",
         "/chats": "Чаты",
         "/profile": "Профиль",
+        "/likes": "Мои лайки",
         "/profile/personal-info": "Личные данные",
         "/profile/aboutme": "Обо мне",
         "/profile/photos": "Фотографии",

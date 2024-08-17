@@ -1,0 +1,16 @@
+.user {
+    &__header-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    &__back-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #eaefff;
+        border-radius: 10px;
+        border: none;
+        padding: 10px 20px;
+    }
+}

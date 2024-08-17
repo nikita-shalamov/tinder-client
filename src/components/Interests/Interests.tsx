@@ -5,8 +5,11 @@ interface InterestsProps {
     textAlignLeft?: boolean;
     active?: boolean;
     profile?: boolean;
+    data: {
+        interests: string[];
+    };
 }
-export default function Interests({ profile = false, label, textAlignLeft, active = true }: InterestsProps) {
+export default function Interests({ data, profile = false, label, textAlignLeft, active = true }: InterestsProps) {
     const { userData, onChangeUserData, changeUserData } = useUserContext();
 
     const interestsList = [
@@ -25,8 +28,8 @@ export default function Interests({ profile = false, label, textAlignLeft, activ
     ];
 
     const items = interestsList.map((item, index) => {
-        if (profile) {
-            if (userData.interests.includes(item.label)) {
+        if (profile && data.interests) {
+            if (data.interests.includes(item.label)) {
                 return (
                     <div key={index} className={"interests__item"} style={!active ? { cursor: "default" } : {}}>
                         {`${item.emoji} ${item.name}`}
