@@ -40,6 +40,9 @@ interface UserContextProps {
     getMyLikes: (telegramId: number) => void;
     getMinimizeUserData: (telegramId: number) => void;
     getMatches: () => void;
+    fetchImageAsFile: (url: string, filename: string) => void;
+    chatData: [];
+    setChatData: (newData: object) => void;
 }
 
 const userContext = createContext<UserContextProps | undefined>(undefined);
@@ -99,6 +102,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [loadingFragment, setLoadingFragment] = useState(undefined);
     const [isDataFetched, setIsDataFetched] = useState(false);
+    const [myId, setMyId] = useState();
+    const [chatData, setChatData] = useState([]);
 
     const [userData, setUserData] = useState({
         telegramId: undefined,
@@ -402,6 +407,12 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 getMyLikes,
                 getMinimizeUserData,
                 getMatches,
+                myId,
+                setMyId,
+                fetchImageAsFile,
+                //@ts-ignore
+                chatData,
+                setChatData,
             }}
         >
             {children}

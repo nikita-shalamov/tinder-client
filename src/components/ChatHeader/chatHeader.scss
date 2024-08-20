@@ -44,6 +44,8 @@
         text-decoration: none;
     }
     &__avatar {
+        min-height: 50px;
+        min-width: 50px;
         width: 50px;
         height: 50px;
         border-radius: 100%;

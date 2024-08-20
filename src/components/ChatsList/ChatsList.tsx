@@ -1,51 +1,109 @@
-import React, { useRef, useEffect, useState } from "react";
-import ChatItem from "../ChatItem/ChatItem";
+import React, { useEffect, useState } from "react";
+import { useUserContext } from "../../context/UserContext";
+import useHttp from "../../hooks/http.hook";
+import { Link } from "react-router-dom";
+import { Skeleton } from "antd";
+import { format, isToday, isYesterday } from "date-fns";
 
 const ChatsList = () => {
-    const lastMessageRef = useRef<HTMLDivElement>(null);
-    const [lastMessageWidth, setLastMessageWidth] = useState<string | number>("auto");
+    const [lastMessageWidth, setLastMessageWidth] = useState(window.innerWidth - 160);
+    const { userData, fetchImageAsFile } = useUserContext();
+    const { request } = useHttp();
+    const [chats, setChats] = useState(undefined);
+
+    const updateChatsWithPhotos = async (chats) => {
+        const updatedChats = await Promise.all(
+            chats.map(async (chat) => {
+                const imageFile = await getPhoto(chat.anotherUser.photos);
+                return {
+                    ...chat,
+                    anotherUser: {
+                        ...chat.anotherUser,
+                        photos: imageFile,
+                    },
+                };
+            })
+        );
+        return updatedChats;
+    };
+
+    const getChats = async () => {
+        const response = await request(`/getChats/${userData.telegramId}`);
+
+        const newChats = await updateChatsWithPhotos(response.chats);
+        const chatsWithMessages = newChats.filter((chat) => chat.lastMessage);
+        console.log(chatsWithMessages);
+
+        setChats(chatsWithMessages);
+    };
+
+    const getPhoto = async (photo: string) => {
+        const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${photo}`, photo);
+        return imageFile;
+    };
 
     useEffect(() => {
-        if (lastMessageRef.current) {
-            const width = window.innerWidth - lastMessageRef.current.offsetWidth - 105;
-            setLastMessageWidth(width);
-        }
+        getChats();
     }, []);
 
-    const chatsData = [
-        {
-            userPhoto: "/photos/photo1.png",
-            userName: "Alex",
-            messageText: "please, buy groceries",
-            messageCounter: 1,
-            time: "11:40 AM",
-            url: "chat1",
-        },
-        {
-            userPhoto: "/photos/photo2.png",
-            userName: "Alex",
-            messageText: "please, buy groceries",
-            messageCounter: 1,
-            time: "11:40 AM",
-            url: "",
-        },
-        {
-            userPhoto: "/photos/photo3.png",
-            userName: "Alex",
-            messageText: "please, buy groceries",
-            messageCounter: 1,
-            time: "11:40 AM",
-            url: "",
-        },
-    ];
+    useEffect(() => {
+        const handleResize = () => {
+            const newWidth = window.innerWidth - 160;
+            if (newWidth !== lastMessageWidth) {
+                setLastMessageWidth(newWidth);
+                console.log("width", newWidth);
+            }
+        };
+
+        // Устанавливаем начальное значение при монтировании компонента
+        handleResize();
+
+        // Добавляем обработчик события изменения размера окна
+        window.addEventListener("resize", handleResize);
+
+        // Убираем обработчик при размонтировании компонента
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, [lastMessageWidth]);
 
     return (
         <div className="chats-list">
             <div className="chats-list__wrapper">
                 <div className="chats-list__items">
-                    {chatsData.map((item, index) => {
-                        return <ChatItem key={index} {...item} width={String(lastMessageWidth)} />;
-                    })}
+                    {chats &&
+                        chats.map((item, index) => {
+                            return (
+                                item.lastMessage && (
+                                    <Link key={index} to={`/chats/${item.anotherUser.telegramId}`} className="chat-item__item">
+                                        <div className="chat-item__col">
+                                            <div className="chat-item__avatar">
+                                                <img src={URL.createObjectURL(item.anotherUser.photos)} alt="" />
+                                            </div>
+                                        </div>
+                                        <div className="chat-item__col">
+                                            <div className="chat-item__name">{item.anotherUser.name}</div>
+                                            <div className="chat-item__last-message" style={{ width: lastMessageWidth }}>
+                                                {item.lastMessage && item.lastMessage.user === userData.telegramId ? `Вы: ${item.lastMessage.content}` : item.lastMessage.content}
+                                            </div>
+                                        </div>
+                                        <div className="chat-item__col">
+                                            <div className="chat-item__time">{format(new Date(item.lastMessage.timestamp), "HH:mm")}</div>
+                                            {/* <div className="chat-item__messages">1</div> */}
+                                        </div>
+                                    </Link>
+                                )
+                            );
+                        })}
+                    {!chats && (
+                        <>
+                            <Skeleton.Input active size={"large"} style={{ width: "100%" }} />
+                            <Skeleton.Input active size={"large"} style={{ width: "100%" }} />
+                            <Skeleton.Input active size={"large"} style={{ width: "100%" }} />
+                            <Skeleton.Input active size={"large"} style={{ width: "100%" }} />
+                        </>
+                    )}
+                    {chats && chats.length === 0 && <div>Лайкайте и пишите взаимным лайкам!</div>}
                 </div>
             </div>
         </div>

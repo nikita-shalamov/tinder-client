@@ -2,49 +2,81 @@
 import React, { useEffect, useRef, useState } from "react";
 import { format, isToday, isYesterday } from "date-fns";
 import { ru } from "date-fns/locale";
+import { useUserContext } from "../../context/UserContext";
+import useHttp from "../../hooks/http.hook";
+import io from "socket.io-client";
+import { Skeleton } from "antd";
 
-// testMessages.js
-const testMessages = [
-    { text: "Hello, how are you?", timestamp: "2024-06-20T10:00:00Z", type: "received" },
-    { text: "Hello, how are you?", timestamp: "2024-07-01T10:00:00Z", type: "received" },
-    { text: "I'm good, thanks!", timestamp: "2024-07-01T10:01:00Z", type: "sent" },
-    { text: "How about you?", timestamp: "2024-07-01T10:05:00Z", type: "received" },
-    { text: "I'm doing great! Just working on a project.", timestamp: "2024-07-01T10:10:00Z", type: "sent" },
-    { text: "Sounds interesting!", timestamp: "2024-07-02T10:15:00Z", type: "received" },
-    { text: "Yeah, it's pretty exciting. I'll tell you more about it later.", timestamp: "2024-07-02T10:20:00Z", type: "sent" },
-    { text: "Looking forward to it!", timestamp: "2024-07-02T10:25:00Z", type: "received" },
-];
+const socket = io("https://shalamov-nikita.ru");
 
 interface Message {
     text: string;
     timestamp: string;
     type: "received" | "sent";
 }
+
+interface GroupedMessage {
+    date: string;
+    messages: Message[];
+}
+
 interface ChatMessagesProps {
     chatId: string;
 }
 
 const ChatMessages = ({ chatId }: ChatMessagesProps) => {
-    const messagesEndRef = useRef(null);
+    const [messages, setMessages] = useState<Message[] | undefined>(undefined);
+    const [room, setRoom] = useState<string | undefined>(undefined);
+    const [currentMessage, setCurrentMessage] = useState("");
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [groupedMessages, setGroupedMessages] = useState<GroupedMessage[] | undefined>(undefined);
 
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [newMessage, setNewMessage] = useState("");
-
-    useEffect(() => {
-        setMessages(testMessages as Message[]);
-    }, [chatId]);
-
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [messages]);
+    const { userData } = useUserContext();
+    const { request } = useHttp();
 
     const getFormattedDate = (timestamp: string) => {
         const date = new Date(timestamp);
         if (isToday(date)) return "Сегодня";
         if (isYesterday(date)) return "Вчера";
         return format(date, "d MMMM", { locale: ru });
+    };
+
+    const checkRoom = async () => {
+        const response = await request("/checkRoom", "POST", { firstUser: userData.telegramId, secondUser: Number(chatId) });
+        if (!response.message) {
+            setRoom(response.room._id);
+        } else {
+            setRoom(response.room);
+        }
+    };
+
+    const getMessages = async () => {
+        const response = await request(`/getMessages/${room}`);
+        const messagesList = [];
+        response.messages.map((item) => {
+            messagesList.push({ type: item.user === userData.telegramId ? "sent" : "received", text: item.content, timestamp: item.timestamp });
+        });
+        return messagesList;
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendMessage(currentMessage, currentTime);
+        }
+    };
+
+    const sendMessage = async (content: string, timestamp: Date) => {
+        if (content !== "") {
+            setCurrentMessage("");
+            socket.emit("message", { room, user: userData.telegramId, message: content, timestamp });
+            await request("/addMessage", "POST", { room, user: userData.telegramId, content, timestamp });
+            if (inputRef.current) {
+                inputRef.current.focus(); // Focus the input after sending the message
+            }
+        }
     };
 
     const groupMessagesByDate = (messages: Message[]) => {
@@ -63,57 +95,100 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
 
         return groupedMessages;
     };
-    const groupedMessages = groupMessagesByDate(messages);
 
-    const handleSendMessage = () => {
-        if (newMessage.trim() === "") return; // Не отправлять пустое сообщение
+    useEffect(() => {
+        checkRoom();
+    }, [chatId, userData]);
 
-        const now = new Date().toISOString();
-        const newMessageObject: Message = {
-            text: newMessage,
-            timestamp: now,
-            type: "sent",
-        };
-
-        setMessages([...messages, newMessageObject]);
-        setNewMessage(""); // Очистить поле ввода
-    };
-    // @ts-ignore
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setNewMessage(e.target.value);
+    const setMessagesData = async () => {
+        const data = await getMessages();
+        setMessages(data);
     };
 
-    // @ts-ignore
-    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            handleSendMessage();
+    useEffect(() => {
+        if (room) {
+            setMessagesData();
+            // подключение к комнате
+            socket.emit("joinRoom", room);
+
+            // обработчик сообщений
+            socket.on("message", (message) => {
+                console.log(message, userData.telegramId);
+
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                        type: message.user === userData.telegramId ? "sent" : "received",
+                        text: message.message,
+                        timestamp: new Date().toISOString(), // Преобразуем в строку ISO
+                    },
+                ]);
+            });
+
+            // очистка обработчика сообщений
+            return () => {
+                socket.off("message");
+            };
         }
-    };
+    }, [room]);
+
+    useEffect(() => {
+        // Прокрутка контейнера сообщений до низа сразу
+
+        if (messages) {
+            const groupedMessagesList = groupMessagesByDate(messages);
+            setGroupedMessages(groupedMessagesList);
+        }
+    }, [messages]);
+
+    useEffect(() => {
+        if (groupedMessages && messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ block: "end" });
+        }
+    }, [groupedMessages]);
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, []);
 
     return (
         <>
             <div className="background-messages">
                 <section className="message-area">
-                    {groupedMessages.map((group, index) => (
-                        <React.Fragment key={index}>
-                            <div className="date">{group.date}</div>
-                            {group.messages.map((message, index) => (
-                                <div key={index} className={`message ${message.type}`}>
-                                    <p>{message.text}</p>
-                                    <span className="timestamp">{format(new Date(message.timestamp), "HH:mm")}</span>
-                                </div>
-                            ))}
-                        </React.Fragment>
-                    ))}
-                    <div ref={messagesEndRef} />
+                    {groupedMessages &&
+                        groupedMessages.map((group, index) => (
+                            <React.Fragment key={index}>
+                                <div className="date">{group.date}</div>
+                                {group.messages.map((message, index) => (
+                                    <div key={index} className={`message ${message.type}`}>
+                                        <p>{message.text}</p>
+                                        <span className="timestamp">{format(new Date(message.timestamp), "HH:mm")}</span>
+                                    </div>
+                                ))}
+                            </React.Fragment>
+                        ))}
+                    {!groupedMessages && (
+                        <>
+                            <Skeleton.Input active className="received" size={"large"} style={{ width: 200 }} />
+                            <Skeleton.Input active className="received" size={"large"} style={{ width: 120 }} />
+                            <Skeleton.Input active size={"large"} style={{ width: 80 }} />
+                            <Skeleton.Input active size={"large"} style={{ width: 100 }} />
+                            <Skeleton.Input active className="received" size={"large"} style={{ width: 160 }} />
+                            <Skeleton.Input active className="received" size={"large"} style={{ width: 180 }} />
+                            <Skeleton.Input active className="received" size={"large"} style={{ width: 120 }} />
+                        </>
+                    )}
                 </section>
                 <footer className="message-input">
-                    <input type="text" value={newMessage} onChange={handleInputChange} onKeyDown={handleKeyDown} placeholder="Type a message" />
-                    <button type="button" onClick={handleSendMessage}>
+                    <input ref={inputRef} type="text" placeholder="Type a message" value={currentMessage} onChange={(e) => setCurrentMessage(e.target.value)} onKeyDown={handleKeyDown} />
+                    <button type="submit" onClick={() => sendMessage(currentMessage, new Date())}>
                         Send
                     </button>
                 </footer>
             </div>
+            <div ref={messagesEndRef} style={{ marginTop: 10 }} />
         </>
     );
 };

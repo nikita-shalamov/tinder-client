@@ -1,14 +1,9 @@
 import { Skeleton } from "antd";
-import { useUserContext } from "../../context/UserContext";
 import SurveyCarousel from "../SurveyCarousel/SurveyCarousel";
-import useHttp from "../../hooks/http.hook";
+import { useNavigate } from "react-router-dom";
 
-const SurveyPicture = ({ onClick, data, isLoading }) => {
-    const writeButton = false;
-
-    const onChangeScrollToElem = () => {
-        onClick.scrollToElement();
-    };
+const SurveyPicture = ({ onClick, data, isLoading, writeButton = false }) => {
+    const navigate = useNavigate();
 
     return (
         <div className="survey-picture">
@@ -23,7 +18,9 @@ const SurveyPicture = ({ onClick, data, isLoading }) => {
                 </div>
 
                 {writeButton ? (
-                    <button className="button survey-picture__write-button">Написать</button>
+                    <button className="button survey-picture__write-button" onClick={() => navigate(`/chats/${data.userId}`)}>
+                        Написать
+                    </button>
                 ) : (
                     <>
                         <div onClick={() => onClick.onChangeDislike()} className="survey-picture__left-swipe">
@@ -32,7 +29,7 @@ const SurveyPicture = ({ onClick, data, isLoading }) => {
                         <div onClick={() => onClick.onChangeLike()} className="survey-picture__right-swipe">
                             <img src="/images/icons/like.svg" alt="" />
                         </div>
-                        <div onClick={() => onClick.onChangeScrollToElem()} className="survey-picture__down-swipe">
+                        <div onClick={() => onClick.scrollToElement()} className="survey-picture__down-swipe">
                             <img src="/images/icons/arrow-down.svg" alt="" />
                         </div>
                     </>

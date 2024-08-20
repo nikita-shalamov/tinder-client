@@ -44,7 +44,7 @@ const Matches = () => {
                     {!loading &&
                         profiles !== undefined &&
                         profiles.map((item, index) => (
-                            <Link to={`/chat/${item.telegramId}`} key={index} className="matches__item">
+                            <Link to={`/chats/${item.telegramId}`} key={index} className="matches__item">
                                 {item && <img src={URL.createObjectURL(item.photo)} alt="" />}
                                 <div className="matches__item-name">{item.name}</div>
                             </Link>

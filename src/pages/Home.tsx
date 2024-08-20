@@ -7,9 +7,10 @@ import useHttp from "../hooks/http.hook";
 import { Button, Result } from "antd";
 import { SmileOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 interface Profile {
     telegramId: number;
-    // Добавьте другие свойства, если есть
 }
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
     const [isLoading, setIsLoading] = useState(true);
     const [profileEnd, setProfileEnd] = useState(false);
     const navigate = useNavigate();
+    const [showMutualAnimation, setShowMutualAnimation] = useState(false);
 
     const [profiles, setProfiles] = useState<Profile[] | undefined>();
 
@@ -63,6 +65,13 @@ export default function Home() {
         setIsLoading(true);
         const response = await request("/addLike", "POST", { fromUser: userData.telegramId, toUser: profiles[profilesCounter].telegramId });
         console.log("onChangeGetNewUser", response);
+
+        if (response.mutual) {
+            setShowMutualAnimation(true);
+            setTimeout(() => {
+                setShowMutualAnimation(false); // Скрываем анимацию через 3 секунды
+            }, 3000);
+        }
 
         setProfileCounter((prevCounter) => {
             const newCounter = prevCounter + 1;
@@ -118,7 +127,11 @@ export default function Home() {
     return (
         <div className="home">
             <div className="home__wrapper">
-                {/* <div style={{ maxWidth: "100%", wordWrap: "break-word" }}>{data}</div> */}
+                {showMutualAnimation && (
+                    <motion.div className="mutual-animation" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 1.5 }}>
+                        💖 It's a Match! 💖
+                    </motion.div>
+                )}
                 <SurveyPicture data={dataOfUser} onClick={{ scrollToElement, onChangeLike, onChangeDislike }} isLoading={isLoading} />
                 <SurveyInfo data={dataOfUser} myRef={targetRef} />
             </div>

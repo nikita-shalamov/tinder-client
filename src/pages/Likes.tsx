@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import { Badge, Button, Result, Skeleton } from "antd";
 import { useCallback, useEffect, useState } from "react";
 
 const Likes = () => {
+    const location = useLocation();
     const { userData, getMyLikes } = useUserContext();
     const [profiles, setProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,7 +49,7 @@ const Likes = () => {
             {profiles !== undefined && !loading && (
                 <div className="likes">
                     {profiles.map((profile, index) => (
-                        <Link to={`/user/${profile.id}`} key={index} className="likes__card">
+                        <Link to={`/user/${profile.id}`} state={{ from: location.pathname }} key={index} className="likes__card">
                             <img src={URL.createObjectURL(profile.photo)} alt={`${profile.name}`} className="likes__photo" />
                             <div className="likes__info">
                                 {profile.name}, {profile.age}
