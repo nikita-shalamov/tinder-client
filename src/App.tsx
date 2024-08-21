@@ -39,6 +39,10 @@ export default function App() {
         if (userId.id !== undefined) {
             takeUserData(Number(userId.id));
             takeUserPhotos(Number(userId.id));
+        } else {
+            takeUserData(15);
+            takeUserPhotos(15);
+            // localStorage.removeItem("filters");
         }
     }, [userId.id]);
 

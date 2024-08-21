@@ -43,16 +43,12 @@ interface UserContextProps {
     fetchImageAsFile: (url: string, filename: string) => void;
     chatData: [];
     setChatData: (newData: object) => void;
+    calculateAge: (birthDate: string) => void;
+    filters: { lowAge: number; highAge: number; sex: string };
+    setFilters: (newData: { lowAge: number; highAge: number; sex: string }) => void;
 }
 
 const userContext = createContext<UserContextProps | undefined>(undefined);
-
-function calculateAge(birthdateString: string) {
-    const birthdate = dayjs(birthdateString);
-    const today = dayjs();
-    return today.diff(birthdate, "year");
-}
-
 const resizeImage = (file) => {
     return new Promise((resolve, reject) => {
         // Проверяем размер файла
@@ -104,6 +100,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isDataFetched, setIsDataFetched] = useState(false);
     const [myId, setMyId] = useState();
     const [chatData, setChatData] = useState([]);
+    const [filters, setFilters] = useState(undefined);
 
     const [userData, setUserData] = useState({
         telegramId: undefined,
@@ -126,6 +123,12 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             ...newData,
         }));
     };
+
+    function calculateAge(birthdateString: string) {
+        const birthdate = dayjs(birthdateString);
+        const today = dayjs();
+        return today.diff(birthdate, "year");
+    }
 
     const takeUserData = async (telegramId: number) => {
         try {
@@ -413,6 +416,9 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 //@ts-ignore
                 chatData,
                 setChatData,
+                calculateAge,
+                filters,
+                setFilters,
             }}
         >
             {children}

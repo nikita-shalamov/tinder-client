@@ -15,7 +15,7 @@ interface Profile {
 
 export default function Home() {
     const targetRef = useRef<HTMLDivElement>(null);
-    const { getAllUserData, userData, isDataFetched } = useUserContext();
+    const { getAllUserData, userData, isDataFetched, calculateAge, filters, setFilters } = useUserContext();
     const [isLoading, setIsLoading] = useState(true);
     const [profileEnd, setProfileEnd] = useState(false);
     const navigate = useNavigate();
@@ -52,13 +52,24 @@ export default function Home() {
     };
 
     const getProfiles = async (telegramId: number) => {
-        if (telegramId) {
-            const data = await request("/getUserProfiles", "POST", { telegramId });
-            setProfiles(data);
-            console.log("getUserProfiles", data);
-        } else {
-            console.log("not request");
-        }
+        const data = await request("/getUserProfiles", "POST", { telegramId });
+
+        const minAge = filters.lowAge;
+        const maxAge = filters.highAge;
+        const requiredSex = filters.sex;
+
+        const filteredProfiles = data.filter((profile: { birthDate: string; sex: { name: string } }) => {
+            const age = calculateAge(profile.birthDate);
+            if (requiredSex !== "all") {
+                return Number(age) >= minAge && Number(age) <= maxAge && profile.sex.name === requiredSex;
+            } else {
+                return Number(age) >= minAge && Number(age) <= maxAge;
+            }
+        });
+
+        setProfiles(filteredProfiles);
+        console.log("getUserProfiles", filteredProfiles);
+        console.log("getUserProfiles", data);
     };
 
     const onChangeLike = async () => {
@@ -94,13 +105,41 @@ export default function Home() {
 
     useEffect(() => {
         if (profiles) {
+            if (profileEnd == true) {
+                setProfileEnd(false);
+            }
+            setProfileCounter(0);
+            setIsLoading(true);
             onChangeGetNewUser(0);
+            console.log(profiles);
         }
     }, [profiles]);
 
     useEffect(() => {
-        if (userData.telegramId) {
+        if (filters) {
+            console.log(filters);
+            setProfiles(undefined);
             getProfiles(userData.telegramId);
+        }
+    }, [filters]);
+
+    useEffect(() => {
+        if (userData.telegramId) {
+            const localFilters = JSON.parse(localStorage.getItem("filters"));
+            if (localFilters) {
+                setFilters(localFilters);
+            } else {
+                const newFilters = { sex: "", lowAge: 0, highAge: 0 };
+                userData.sex === "man" ? (newFilters.sex = "woman") : (newFilters.sex = "man");
+
+                const currentYears = Number(calculateAge(userData.birthDate));
+
+                currentYears - 3 < 18 ? (newFilters.lowAge = 18) : (newFilters.lowAge = currentYears - 3);
+                currentYears + 3 > 100 ? (newFilters.highAge = 100) : (newFilters.highAge = currentYears + 3);
+
+                setFilters(newFilters);
+                localStorage.setItem("filters", JSON.stringify(newFilters));
+            }
         }
     }, [isDataFetched]);
 
