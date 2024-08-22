@@ -51,6 +51,8 @@
     }
 }
 
+
+
 .message.received {
     background-color: #e0e0e0;
     align-self: flex-start;
@@ -60,19 +62,43 @@
     background-color: #2cb9ff;
     color: white;
     align-self: flex-end;
+    position: relative;
+    .check {
+        width: 18px;
+        height: 18px;
+        // position: absolute;
+        // left: -24px;
+        // bottom: 0;
+        // display: block;
+    }
 }
 
 .message .timestamp {
     font-size: 12px;
     color: #545454;
-    margin-top: 5px;
+    margin-top: 2px;
     align-self: flex-end;
+}
+
+.sent .timestamp {
+    justify-content: center;
+    display: flex;
+    line-height: normal;
+    height: 18px;
+    line-height: 18px;
+    gap: 3px;
+    &.timestamp-one {
+        line-height: 15px;
+        gap: 1px;
+    }
+    .check-one {
+        height: 15px;
+    }
 }
 
 .received .timestamp {
     font-size: 12px;
     color: #545454;
-    margin-top: 5px;
     align-self: flex-start;
 }
 

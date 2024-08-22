@@ -30,9 +30,15 @@ const ChatsList = () => {
     const getChats = async () => {
         const response = await request(`/getChats/${userData.telegramId}`);
 
+        console.log("response getChats", response.chats);
+
         const newChats = await updateChatsWithPhotos(response.chats);
         const chatsWithMessages = newChats.filter((chat) => chat.lastMessage);
-        console.log(chatsWithMessages);
+
+        // Сортировка по дате последнего сообщения
+        chatsWithMessages.sort((a, b) => new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime());
+
+        console.log("chatsWithMessages", chatsWithMessages);
 
         setChats(chatsWithMessages);
     };
@@ -88,8 +94,22 @@ const ChatsList = () => {
                                             </div>
                                         </div>
                                         <div className="chat-item__col">
-                                            <div className="chat-item__time">{format(new Date(item.lastMessage.timestamp), "HH:mm")}</div>
-                                            {/* <div className="chat-item__messages">1</div> */}
+                                            <div className="chat-item__time">
+                                                {item.lastMessage.user === userData.telegramId && (
+                                                    <img
+                                                        className={item.lastMessage.isRead ? "check" : "check check-one"}
+                                                        src={item.lastMessage.isRead ? "/images/icons/double-check.svg" : "/images/icons/check.svg"}
+                                                        alt=""
+                                                    />
+                                                )}
+                                                {isToday(new Date(item.lastMessage.timestamp))
+                                                    ? format(new Date(item.lastMessage.timestamp), "HH:mm")
+                                                    : isYesterday(new Date(item.lastMessage.timestamp))
+                                                      ? "Вчера"
+                                                      : format(new Date(item.lastMessage.timestamp), "dd.MM.yyyy")}
+                                            </div>
+
+                                            {item.unReadMessages !== 0 && <div className="chat-item__messages">{item.unReadMessages}</div>}
                                         </div>
                                     </Link>
                                 )

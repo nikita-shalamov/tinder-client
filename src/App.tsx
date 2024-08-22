@@ -39,9 +39,6 @@ export default function App() {
         if (userId.id !== undefined) {
             takeUserData(Number(userId.id));
             takeUserPhotos(Number(userId.id));
-        } else {
-            takeUserData(18);
-            takeUserPhotos(18);
         }
     }, [userId.id]);
 

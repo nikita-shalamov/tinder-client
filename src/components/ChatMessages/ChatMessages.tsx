@@ -14,6 +14,7 @@ interface Message {
     text: string;
     timestamp: string;
     type: "received" | "sent";
+    isRead: boolean;
 }
 
 interface GroupedMessage {
@@ -57,7 +58,12 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
         const response = await request(`/getMessages/${room}`);
         const messagesList = [];
         response.messages.map((item) => {
-            messagesList.push({ type: item.user === userData.telegramId ? "sent" : "received", text: item.content, timestamp: item.timestamp });
+            messagesList.push({
+                type: item.user === userData.telegramId ? "sent" : "received",
+                text: item.content,
+                timestamp: item.timestamp,
+                isRead: item.isRead, // Добавляем это поле
+            });
         });
         return messagesList;
     };
@@ -122,6 +128,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                         type: message.user === userData.telegramId ? "sent" : "received",
                         text: message.message,
                         timestamp: new Date().toISOString(), // Преобразуем в строку ISO
+                        isRead: message.isRead,
                     },
                 ]);
             });
@@ -154,6 +161,16 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
         }
     }, []);
 
+    useEffect(() => {
+        const markMessagesAsRead = async () => {
+            await request(`/markMessagesAsRead/${room}`, "POST", { userId: userData.telegramId });
+        };
+
+        if (room) {
+            markMessagesAsRead();
+        }
+    }, [room]);
+
     return (
         <>
             <div className="background-messages">
@@ -165,7 +182,16 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                                 {group.messages.map((message, index) => (
                                     <div key={index} className={`message ${message.type}`}>
                                         <p>{message.text}</p>
-                                        <span className="timestamp">{format(new Date(message.timestamp), "HH:mm")}</span>
+                                        <span className={message.isRead ? "timestamp" : "timestamp timestamp-one"}>
+                                            {format(new Date(message.timestamp), "HH:mm")}
+                                            {message.type === "sent" && (
+                                                <img
+                                                    className={message.isRead ? "check" : "check check-one"}
+                                                    src={message.isRead ? "/images/icons/double-check.svg" : "/images/icons/check.svg"}
+                                                    alt=""
+                                                />
+                                            )}
+                                        </span>
                                     </div>
                                 ))}
                             </React.Fragment>
