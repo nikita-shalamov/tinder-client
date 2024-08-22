@@ -11,13 +11,16 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        padding: 5px 0 0px 0;
     }
     &__field {
         width: 100%;
         height: auto;
         margin: 0 auto;
-        margin-top: 15px;
+    }
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
     &__label {
         font-size: 20px;
@@ -42,16 +45,27 @@
                 font-size: 17px;
             }
         }
+        &-sex {
+            display: block;
+            margin-top: 5px;
+            width: 250px;
+            height: 48px;   
+            .ant-segmented-group {
+                height: 100%;
+                .ant-segmented-item {
+                    width: 50%;
+                }
+                .ant-segmented-item-label {
+                    min-height: 45px;
+                    line-height: 45px;
+                    font-size: 17px;
+                }
+            }         
+            
+        }
     }
-    // &__button {
-    //     margin: 0 auto;
-    //     margin-top: 20px;
-    //     width: 100%;
-    //     height: 50px;
-    //     color: #fff;
-    //     font-weight: 700;
-    //     font-size: 24px;
-    //     border: none;
-    //     border-radius: 12px;
-    // }
+}
+
+.ant-picker-dropdown {
+    display: none;
 }

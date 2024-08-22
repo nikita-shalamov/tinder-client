@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import useHttp from "../hooks/http.hook";
 import axios from "axios";
 import dayjs from "dayjs";
-import Pica from "pica";
 import Compressor from "compressorjs";
 
 interface UserContextProps {
@@ -168,7 +167,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const getMinimizeUserData = async (telegramId: number) => {
         const responseData = await request("/takeUserData", "POST", { telegramId });
         const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
-        const { name, birthDate, sex, city, description, interests } = responseData.message;
+        const { name, birthDate } = responseData.message;
         const year = calculateAge(birthDate);
 
         const userPhoto = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${responsePhotos.photos[0]}`, responsePhotos.photos[0]);

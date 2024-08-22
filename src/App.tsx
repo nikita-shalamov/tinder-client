@@ -40,9 +40,8 @@ export default function App() {
             takeUserData(Number(userId.id));
             takeUserPhotos(Number(userId.id));
         } else {
-            takeUserData(15);
-            takeUserPhotos(15);
-            // localStorage.removeItem("filters");
+            takeUserData(18);
+            takeUserPhotos(18);
         }
     }, [userId.id]);
 

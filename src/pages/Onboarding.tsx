@@ -64,7 +64,7 @@ export default function Onboarding() {
     return (
         <>
             <div className="background">
-                <div className="background__wrapper" style={progress === 0 ? { height: "100vh", position: "relative" } : {}}>
+                <div className="background__wrapper background__wrapper_onboarding">
                     {alert && <Alert style={{ position: "absolute", right: "20px", top: 20, zIndex: 100, width: "calc(100% - 30px)" }} message={alert} type="error" showIcon />}
                     <ProgressBar lines={4} fill={progress} />
                     <Routes>

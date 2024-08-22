@@ -1,10 +1,10 @@
 .add-photos {
     &__wrapper {
-        padding: 10px;
-        padding-bottom: 0px;
+        padding: 0 10px;
     }
     &__title {
         font-weight: 700;
+        margin: 5px 0;
     }
     &__list {
         display: grid;
@@ -61,6 +61,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 5px 0 20px 0;
     }
     &__download {
         border: none;

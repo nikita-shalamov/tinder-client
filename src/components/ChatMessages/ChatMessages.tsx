@@ -7,8 +7,8 @@ import useHttp from "../../hooks/http.hook";
 import io from "socket.io-client";
 import { Skeleton } from "antd";
 
-// const socket = io("https://shalamov-nikita.ru");
-const socket = io("http://localhost:3000");
+const socket = io("https://shalamov-nikita.ru");
+// const socket = io("http://localhost:3000");
 
 interface Message {
     text: string;

@@ -88,8 +88,8 @@ export default function AddPhotos({ header = true }: AddPhotosProps) {
         <div className="add-photos">
             <div className="add-photos__wrapper">
                 {alert && <Alert style={{ position: "absolute", right: "20px", zIndex: "100" }} message={alert} type="error" showIcon />}
-                <div className="add-photos__header" style={header ? {} : { display: "none" }}>
-                    <h2 className="add-photos__title">Фотографии</h2>
+                <div className="add-photos__header" style={header ? {} : { justifyContent: "flex-end" }}>
+                    {header && <h2 className="add-photos__title">Фотографии</h2>}
                     <button className="add-photos__download" onClick={onChangePhotoTelegram}>
                         Из телеграма
                     </button>

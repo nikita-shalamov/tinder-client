@@ -1,12 +1,14 @@
-import { Input, Select } from "antd";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Input, Segmented, Select } from "antd";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
 import { useUserContext } from "../../context/UserContext";
+import { WomanOutlined, ManOutlined } from "@ant-design/icons";
 
 const RegPage = () => {
     const { userData, onChangeUserData, missingFields } = useUserContext();
 
-    const dateFormat = "DD-MM-YYYY";
+    const dateFormat = "DD.MM.YYYY";
 
     const onChangeData = (name: string, value: string) => {
         onChangeUserData({ [name]: value });
@@ -40,37 +42,24 @@ const RegPage = () => {
                             Дата рождения
                         </label>
                         {userData && (
-                            <DatePicker
-                                format={dateFormat}
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                // @ts-ignore
-                                onChange={(e) => onChangeData("birthDate", e)}
-                                defaultValue={userData.birthDate !== undefined ? dayjs(userData.birthDate) : ""}
-                                name="birthDate"
-                                className="reg-page__input"
-                                placeholder="Дата рождения"
-                                status={missingFields.includes("Дата рождения") ? "error" : ""}
-                            />
+                            <>
+                                <DatePicker
+                                    format={{
+                                        format: "DD.MM.YYYY",
+                                        type: "mask",
+                                    }}
+                                    //@ts-ignore
+                                    onChange={(e) => onChangeData("birthDate", e)}
+                                    defaultValue={userData.birthDate !== undefined ? dayjs(userData.birthDate) : ""}
+                                    name="birthDate"
+                                    className="reg-page__input"
+                                    placeholder="Дата рождения"
+                                    status={missingFields.includes("Дата рождения") ? "error" : ""}
+                                />
+                            </>
                         )}
                     </div>
-                    {/* // ПОЛ */}
-                    <div className="reg-page__field">
-                        <label htmlFor="birthDate" className="reg-page__label">
-                            Пол
-                        </label>
-                        <Select
-                            className="reg-page__input"
-                            defaultValue="Ваш пол"
-                            style={{ width: "100%", height: "100%", borderRadius: "12px" }}
-                            onChange={(e) => onChangeData("sex", e)}
-                            value={userData.sex}
-                            options={[
-                                { value: "man", label: "Мужской" },
-                                { value: "woman", label: "Женский" },
-                            ]}
-                            status={missingFields.includes("Пол") ? "error" : ""}
-                        />
-                    </div>
+
                     {/* // ГОРОД */}
                     <div className="reg-page__field">
                         <label htmlFor="birthDate" className="reg-page__label">
@@ -94,6 +83,22 @@ const RegPage = () => {
                                 },
                             ]}
                             status={missingFields.includes("Город") ? "error" : ""}
+                        />
+                    </div>
+                    {/* // ПОЛ */}
+                    <div className="reg-page__field">
+                        <label htmlFor="birthDate" className="reg-page__label">
+                            Пол
+                        </label>
+                        <Segmented
+                            className="reg-page__input-sex"
+                            value={userData.sex}
+                            onChange={(e) => onChangeData("sex", e)}
+                            options={[
+                                { label: "Мужской", value: "man", icon: <ManOutlined /> },
+                                { label: "Женский", value: "woman", icon: <WomanOutlined /> },
+                            ]}
+                            size="large"
                         />
                     </div>
                 </form>

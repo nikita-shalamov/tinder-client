@@ -1,10 +1,9 @@
 .survey-picture {
     &__wrapper {
-        height: calc(100vh - 83px);
+        height: calc(100vh - 70px);
         width: 100%;
         padding: 0px 20px 86px 20px;
         position: relative;
-
     }
     &__left-swipe, &__right-swipe, &__down-swipe {
         position: absolute;

@@ -24,7 +24,7 @@ export default function AboutMe() {
                             name="description"
                             placeholder="Введите описание о себе"
                             onChange={(e) => handleChangeDescr(e.target.name, e.target.value)}
-                            style={descrStatus ? { border: "1px solid #ffa39e", borderRadius: "10px", padding: "10px 5px" } : {}}
+                            style={!userData.description ? { border: "1.5px solid #ff4d4f", borderRadius: "10px", padding: "10px 5px" } : {}}
                         ></textarea>
                     </form>
                 </div>
