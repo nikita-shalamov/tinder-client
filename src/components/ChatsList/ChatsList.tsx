@@ -6,7 +6,7 @@ import { Skeleton } from "antd";
 import { format, isToday, isYesterday } from "date-fns";
 
 const ChatsList = () => {
-    const [lastMessageWidth, setLastMessageWidth] = useState(window.innerWidth - 160);
+    const [lastMessageWidth, setLastMessageWidth] = useState(window.innerWidth - 185);
     const { userData, fetchImageAsFile } = useUserContext();
     const { request } = useHttp();
     const [chats, setChats] = useState(undefined);
@@ -54,10 +54,9 @@ const ChatsList = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            const newWidth = window.innerWidth - 160;
+            const newWidth = window.innerWidth - 185;
             if (newWidth !== lastMessageWidth) {
                 setLastMessageWidth(newWidth);
-                console.log("width", newWidth);
             }
         };
 
