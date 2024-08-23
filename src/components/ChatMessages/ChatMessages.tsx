@@ -144,7 +144,9 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
 
                     // Filter the messages and update the isRead status
                     return prevMessages.map((item) => {
-                        if (item.isRead === false || (item.isRead === undefined && item.userId !== user.user)) {
+                        console.log(item, item.userId);
+                        console.log(item, userData.telegramId);
+                        if ((item.isRead === false || item.isRead === undefined) && item.userId !== userData.telegramId) {
                             return { ...item, isRead: true }; // Update isRead status
                         }
                         return item;
@@ -191,9 +193,12 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     }, [room]);
 
     useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
+        if (isFetched && messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
         }
+    }, [groupedMessages]);
+
+    useEffect(() => {
         if (room) {
             const observer = new IntersectionObserver((entries) => {
                 const lastMessageEntry = entries[0];

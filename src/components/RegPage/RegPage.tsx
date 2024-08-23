@@ -14,6 +14,10 @@ const RegPage = () => {
         onChangeUserData({ [name]: value });
     };
 
+    const handleDateChange = (date: dayjs.Dayjs | null, dateString: string) => {
+        onChangeData("birthDate", dateString);
+    };
+
     return (
         <div className="reg-page">
             <div className="reg-page__wrapper">
@@ -44,13 +48,9 @@ const RegPage = () => {
                         {userData && (
                             <>
                                 <DatePicker
-                                    format={{
-                                        format: "DD.MM.YYYY",
-                                        type: "mask",
-                                    }}
-                                    //@ts-ignore
-                                    onChange={(e) => onChangeData("birthDate", e)}
-                                    defaultValue={userData.birthDate !== undefined ? dayjs(userData.birthDate) : ""}
+                                    format="DD.MM.YYYY"
+                                    onChange={handleDateChange}
+                                    defaultValue={userData.birthDate ? dayjs(userData.birthDate) : null}
                                     name="birthDate"
                                     className="reg-page__input"
                                     placeholder="Дата рождения"

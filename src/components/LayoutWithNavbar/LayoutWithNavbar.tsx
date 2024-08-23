@@ -28,12 +28,16 @@ const LayoutWithNavbar = () => {
         }
     };
 
+    const navbar = (url: string) => {
+        return url.includes("/chats/") ? null : <Navbar />;
+    };
+
     return (
         <div className="background background_min">
             <div className="background__wrapper">
                 {headerExist(normalizedPathname)}
                 <Outlet />
-                <Navbar />
+                {navbar(normalizedPathname)}
             </div>
         </div>
     );
