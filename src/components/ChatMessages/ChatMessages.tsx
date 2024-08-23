@@ -144,7 +144,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
 
                     // Filter the messages and update the isRead status
                     return prevMessages.map((item) => {
-                        if (item.isRead === false && item.userId !== user.user) {
+                        if (item.isRead === false || (item.isRead === undefined && item.userId !== user.user)) {
                             return { ...item, isRead: true }; // Update isRead status
                         }
                         return item;
