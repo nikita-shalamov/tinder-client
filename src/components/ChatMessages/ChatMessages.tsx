@@ -15,6 +15,7 @@ interface Message {
     timestamp: string;
     type: "received" | "sent";
     isRead: boolean;
+    userId: number;
 }
 
 interface GroupedMessage {
@@ -34,7 +35,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [groupedMessages, setGroupedMessages] = useState<GroupedMessage[] | undefined>(undefined);
-
+    const [isFetched, setIsFetched] = useState(undefined);
     const { userData } = useUserContext();
     const { request } = useHttp();
 
@@ -63,6 +64,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                 text: item.content,
                 timestamp: item.timestamp,
                 isRead: item.isRead, // Добавляем это поле
+                userId: item.user,
             });
         });
         return messagesList;
@@ -127,47 +129,91 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                     {
                         type: message.user === userData.telegramId ? "sent" : "received",
                         text: message.message,
-                        timestamp: new Date().toISOString(), // Преобразуем в строку ISO
+                        timestamp: new Date().toISOString(),
                         isRead: message.isRead,
+                        userId: message.user,
                     },
                 ]);
             });
 
-            // очистка обработчика сообщений
+            socket.on("markRead", (user) => {
+                console.log(user);
+
+                setMessages((prevMessages) => {
+                    if (!prevMessages) return prevMessages; // If messages are undefined, return as is
+
+                    // Filter the messages and update the isRead status
+                    return prevMessages.map((item) => {
+                        if (item.isRead === false && item.userId !== user.user) {
+                            return { ...item, isRead: true }; // Update isRead status
+                        }
+                        return item;
+                    });
+                });
+            });
+
             return () => {
                 socket.off("message");
+                socket.off("markRead");
             };
         }
     }, [room]);
 
     useEffect(() => {
-        // Прокрутка контейнера сообщений до низа сразу
+        console.log(messages);
 
         if (messages) {
             const groupedMessagesList = groupMessagesByDate(messages);
             setGroupedMessages(groupedMessagesList);
+            if (!isFetched) {
+                setIsFetched(true);
+            }
         }
     }, [messages]);
 
     useEffect(() => {
-        if (groupedMessages && messagesEndRef.current) {
+        if (isFetched && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ block: "end" });
         }
-    }, [groupedMessages]);
+    }, [isFetched]);
+
+    const markMessagesAsRead = async () => {
+        console.log(userData.telegramId, room);
+
+        socket.emit("markRead", { user: userData.telegramId, room: room });
+        await request(`/markMessagesAsRead/${room}`, "POST", { userId: userData.telegramId });
+    };
+
+    useEffect(() => {
+        if (room) {
+            markMessagesAsRead();
+        }
+    }, [room]);
 
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
-    }, []);
-
-    useEffect(() => {
-        const markMessagesAsRead = async () => {
-            await request(`/markMessagesAsRead/${room}`, "POST", { userId: userData.telegramId });
-        };
-
         if (room) {
-            markMessagesAsRead();
+            const observer = new IntersectionObserver((entries) => {
+                const lastMessageEntry = entries[0];
+                if (lastMessageEntry.isIntersecting) {
+                    console.log("Последнее сообщение прочитано.");
+                    console.log(messages);
+                    markMessagesAsRead();
+                    // socket.emit("markRead", { user: userData.telegramId, room: room });
+                }
+            });
+
+            if (messagesEndRef.current) {
+                observer.observe(messagesEndRef.current);
+            }
+
+            return () => {
+                if (messagesEndRef.current) {
+                    observer.unobserve(messagesEndRef.current);
+                }
+            };
         }
     }, [room]);
 
@@ -207,6 +253,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                             <Skeleton.Input active className="received" size={"large"} style={{ width: 120 }} />
                         </>
                     )}
+                    <div ref={messagesEndRef} style={{ marginTop: 20 }} />
                 </section>
                 <footer className="message-input">
                     <input ref={inputRef} type="text" placeholder="Type a message" value={currentMessage} onChange={(e) => setCurrentMessage(e.target.value)} onKeyDown={handleKeyDown} />
@@ -215,7 +262,6 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                     </button>
                 </footer>
             </div>
-            <div ref={messagesEndRef} style={{ marginTop: 10 }} />
         </>
     );
 };
