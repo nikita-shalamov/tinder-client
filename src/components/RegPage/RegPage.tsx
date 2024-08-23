@@ -10,12 +10,14 @@ const RegPage = () => {
 
     const dateFormat = "DD.MM.YYYY";
 
-    const onChangeData = (name: string, value: string) => {
-        onChangeUserData({ [name]: value });
+    const handleDateChange = (date: dayjs.Dayjs | null, dateString: string) => {
+        console.log(dateString);
+
+        onChangeData("birthDate", dateString);
     };
 
-    const handleDateChange = (date: dayjs.Dayjs | null, dateString: string) => {
-        onChangeData("birthDate", dateString);
+    const onChangeData = (name: string, value: string) => {
+        onChangeUserData({ [name]: value });
     };
 
     return (
@@ -48,7 +50,7 @@ const RegPage = () => {
                         {userData && (
                             <>
                                 <DatePicker
-                                    format="DD.MM.YYYY"
+                                    format={dateFormat}
                                     onChange={handleDateChange}
                                     defaultValue={userData.birthDate ? dayjs(userData.birthDate) : null}
                                     name="birthDate"

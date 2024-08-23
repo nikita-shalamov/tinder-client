@@ -78,13 +78,13 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     };
 
     const sendMessage = async (content: string, timestamp: Date) => {
+        if (inputRef.current) {
+            inputRef.current.focus(); // Focus the input after sending the message
+        }
         if (content !== "") {
             setCurrentMessage("");
             socket.emit("message", { room, user: userData.telegramId, message: content, timestamp });
             await request("/addMessage", "POST", { room, user: userData.telegramId, content, timestamp });
-            if (inputRef.current) {
-                inputRef.current.focus(); // Focus the input after sending the message
-            }
         }
     };
 
@@ -262,7 +262,13 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                 </section>
                 <footer className="message-input">
                     <input ref={inputRef} type="text" placeholder="Type a message" value={currentMessage} onChange={(e) => setCurrentMessage(e.target.value)} onKeyDown={handleKeyDown} />
-                    <button type="submit" onClick={() => sendMessage(currentMessage, new Date())}>
+                    <button
+                        type="submit"
+                        onClick={(event) => {
+                            event.preventDefault();
+                            sendMessage(currentMessage, new Date());
+                        }}
+                    >
                         Send
                     </button>
                 </footer>
