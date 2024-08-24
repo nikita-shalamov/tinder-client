@@ -11,7 +11,7 @@ interface BirthDateInputProps {
     defaultDate: string;
 }
 
-const BirthDateInput: React.FC = ({ onChange, defaultDate }: BirthDateInputProps) => {
+const BirthDateInput: React.FC<BirthDateInputProps> = ({ onChange, defaultDate }) => {
     let defaultDateNormal;
     if (defaultDate !== "") {
         defaultDateNormal = dayjs(defaultDate).format("DD.MM.YYYY");
