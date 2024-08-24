@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import { useUserContext } from "../../context/UserContext";
 import { WomanOutlined, ManOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
 import BirthDateInput from "./DateInput";
 
 const RegPage = () => {
