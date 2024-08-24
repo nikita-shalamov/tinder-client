@@ -40,8 +40,8 @@ export default function App() {
             takeUserData(Number(userId.id));
             takeUserPhotos(Number(userId.id));
         } else {
-            takeUserData(999);
-            takeUserPhotos(999);
+            takeUserData(998);
+            takeUserPhotos(998);
         }
     }, [userId.id]);
 

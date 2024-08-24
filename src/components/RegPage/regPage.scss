@@ -37,6 +37,10 @@
         color: #21262E;
         font-size: 17px;
         padding: 10px 15px;
+        outline: none;
+        &.input-error {
+            border-color:#ff4d4f;
+        }
         &::placeholder {
             font-size: 17px;
         }
@@ -44,6 +48,9 @@
             &::placeholder {
                 font-size: 17px;
             }
+        }
+        &:focus {
+            border-color: #4096ff; /* Цвет границы при фокусе */
         }
         &-sex {
             display: block;

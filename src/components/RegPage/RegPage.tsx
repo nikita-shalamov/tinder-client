@@ -4,20 +4,17 @@ import { DatePicker } from "antd";
 import dayjs from "dayjs";
 import { useUserContext } from "../../context/UserContext";
 import { WomanOutlined, ManOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import BirthDateInput from "./DateInput";
 
 const RegPage = () => {
     const { userData, onChangeUserData, missingFields } = useUserContext();
 
-    const dateFormat = "DD.MM.YYYY";
-
-    const handleDateChange = (date: dayjs.Dayjs | null, dateString: string) => {
-        console.log(dateString);
-
-        onChangeData("birthDate", dateString);
-    };
-
     const onChangeData = (name: string, value: string) => {
         onChangeUserData({ [name]: value });
+
+        console.log(value, userData);
     };
 
     return (
@@ -47,21 +44,20 @@ const RegPage = () => {
                         <label htmlFor="birthDate" className="reg-page__label">
                             Дата рождения
                         </label>
-                        {userData && (
-                            <>
-                                <DatePicker
-                                    format={dateFormat}
-                                    onChange={handleDateChange}
-                                    defaultValue={userData.birthDate ? dayjs(userData.birthDate) : null}
-                                    name="birthDate"
-                                    className="reg-page__input"
-                                    placeholder="Дата рождения"
-                                    status={missingFields.includes("Дата рождения") ? "error" : ""}
-                                />
-                            </>
-                        )}
+                        {userData && <BirthDateInput defaultDate={userData.birthDate ? userData.birthDate : ""} onChange={onChangeData} />}
+                        {/* {userData && (
+                            // <DatePicker
+                            //     format={dateFormat}
+                            //     onChange={(e) => onChangeData("birthDate", e)}
+                            //     defaultValue={userData.birthDate !== undefined ? dayjs(userData.birthDate) : ""}
+                            //     name="birthDate"
+                            //     className="reg-page__input"
+                            //     placeholder="Дата рождения"
+                            //     status={missingFields.includes("Дата рождения") ? "error" : ""}
+                            // />
+                            
+                        )} */}
                     </div>
-
                     {/* // ГОРОД */}
                     <div className="reg-page__field">
                         <label htmlFor="birthDate" className="reg-page__label">
