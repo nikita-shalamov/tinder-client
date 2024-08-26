@@ -11,39 +11,42 @@ import Loading from "./pages/Loading";
 import { useUserContext } from "./context/UserContext";
 import Likes from "./pages/Likes";
 import User from "./components/User/User";
-
-function ensureDocumentIsScrollable() {
-    const isScrollable = document.documentElement.scrollHeight > window.innerHeight;
-    if (!isScrollable) {
-        document.documentElement.style.setProperty("height", "calc(100vh + 1px)", "important");
-    }
-}
-function preventCollapse() {
-    if (window.scrollY === 0) {
-        window.scrollTo(0, 1);
-    }
-}
-const scrollableElement = document.querySelector(".background");
-if (scrollableElement) {
-    scrollableElement.addEventListener("touchstart", preventCollapse);
-}
-window.addEventListener("load", ensureDocumentIsScrollable);
+import useHttp from "./hooks/http.hook";
+import axios from "axios";
 
 export default function App() {
     const navigate = useNavigate();
 
-    const { loading, setLoading, takeUserData, userData, isDataFetched, userPhotos, takeUserPhotos } = useUserContext();
+    const { loading, setLoading, takeUserData, userData, isDataFetched, userPhotos, takeUserPhotos, token, setToken } = useUserContext();
+    const { request } = useHttp();
     const userId = useUserData();
 
     useEffect(() => {
+        const checkAuthToken = async () => {
+            try {
+                const response = await request("/login", "POST", { telegramId: userId.id });
+
+                localStorage.setItem("token", response.token);
+                setToken(response.token);
+
+                axios.defaults.headers.common["Authorization"] = `Bearer ${response.token}`;
+            } catch (e) {
+                console.error("Authentication failed", e);
+                navigate("/onboarding");
+            }
+        };
+
         if (userId.id !== undefined) {
-            takeUserData(Number(userId.id));
-            takeUserPhotos(Number(userId.id));
-        } else {
-            takeUserData(998);
-            takeUserPhotos(998);
+            checkAuthToken();
         }
     }, [userId.id]);
+
+    useEffect(() => {
+        if (token !== null) {
+            takeUserData(Number(userId.id));
+            takeUserPhotos(Number(userId.id));
+        }
+    }, [token]);
 
     useEffect(() => {
         console.log(userData, userPhotos);

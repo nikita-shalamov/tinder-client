@@ -8,6 +8,8 @@ import Compressor from "compressorjs";
 interface UserContextProps {
     isAuthenticated: boolean | undefined;
     setIsAuthenticated: (authenticated: boolean) => void;
+    token: string | null;
+    setToken: (token: string | null) => void;
     loading: boolean;
     setLoading: (load: boolean) => void;
     loadingFragment: boolean;
@@ -94,6 +96,7 @@ const resizeImage = (file) => {
 const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { request } = useHttp();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined);
+    const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [loadingFragment, setLoadingFragment] = useState(undefined);
     const [isDataFetched, setIsDataFetched] = useState(false);
@@ -131,7 +134,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const takeUserData = async (telegramId: number) => {
         try {
-            const response = await request("/takeUserData", "POST", { telegramId });
+            const response = await request("/takeUserData", "POST", { telegramId }, {}, token);
             const { name, birthDate, sex, city, description, interests } = response.message;
 
             onChangeUserData({ telegramId: telegramId, name, birthDate, sex, city, description, interests });
@@ -145,7 +148,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const getAllUserData = async (telegramId: number) => {
         try {
-            const responseData = await request("/takeUserData", "POST", { telegramId });
+            const responseData = await request("/takeUserData", "POST", { telegramId }, {}, token);
             const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
             const { name, birthDate, sex, city, description, interests } = responseData.message;
             const year = calculateAge(birthDate);
@@ -165,7 +168,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     const getMinimizeUserData = async (telegramId: number) => {
-        const responseData = await request("/takeUserData", "POST", { telegramId });
+        const responseData = await request("/takeUserData", "POST", { telegramId }, {}, token);
         const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
         const { name, birthDate } = responseData.message;
         const year = calculateAge(birthDate);
@@ -386,6 +389,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             value={{
                 isAuthenticated,
                 setIsAuthenticated,
+                token,
+                setToken,
                 loading,
                 setLoading,
                 userData,

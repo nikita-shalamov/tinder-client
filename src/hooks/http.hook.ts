@@ -2,22 +2,30 @@
 import { useCallback } from "react";
 
 const useHttp = () => {
-  const request = useCallback(async (url: string, method = "GET", body: object | FormData | null = null, headers: Record<string, string> = {}) => {
+  const request = useCallback(async (
+    url: string, 
+    method = "GET", 
+    body: object | FormData | null | string = null, 
+    headers: Record<string, string> = {},
+    token: string | null = null  // Добавляем токен как параметр
+  ) => {
     try {
-      // Check if body is an instance of FormData
+      // Если токен есть, добавляем его в заголовок Authorization
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      // Если body не FormData, сериализуем в JSON
       if (body && !(body instanceof FormData)) {
-        // If not FormData, assume JSON and stringify the body
-        // @ts-ignore
         body = JSON.stringify(body);
         console.log("Request body (JSON):", body);
-
-        // Set the content type to JSON
         headers["Content-Type"] = "application/json";
       } else if (body instanceof FormData) {
         console.log("Request body (FormData):", body);
-        // If it's FormData, the Content-Type will be automatically set by the browser
       }
-      // @ts-ignore
+
+      // Отправляем запрос
+      //@ts-ignore
       const response = await fetch(import.meta.env.VITE_BASE_URL + url, { method, body, headers });
 
       console.log('Response:', response);
@@ -31,11 +39,11 @@ const useHttp = () => {
 
       if (contentType?.includes("application/json")) {
         const data = await response.json();
-        console.log("JSON data received:", data);  // Log received JSON data
+        console.log("JSON data received:", data);
         return data;
       } else {
         const blobData = await response.blob();
-        console.log("Blob data received:", blobData);  // Log binary data
+        console.log("Blob data received:", blobData);
         return blobData;
       }
     } catch (e) {
