@@ -5,7 +5,7 @@ import BirthDateInput from "./DateInput";
 import { cities } from "../../constants/cities";
 
 interface RegPageProps {
-    setFormErrors: React.Dispatch<React.SetStateAction<string[]>>;
+    setFormErrors?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const RegPage = ({ setFormErrors }: RegPageProps) => {

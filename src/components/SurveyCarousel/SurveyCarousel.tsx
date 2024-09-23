@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef } from "react";
 import { Carousel } from "antd";
+import type { CarouselRef } from "antd/lib/carousel"; // Импортируем тип CarouselRef
 
 interface surveyCarouselProps {
     photos: File[];
@@ -8,7 +9,7 @@ interface surveyCarouselProps {
 
 const SurveyCarousel = React.memo(({ photos }: surveyCarouselProps) => {
     // Создаем реф для компонента Carousel
-    const carouselRef = useRef();
+    const carouselRef = useRef<CarouselRef>(null);
 
     // Обработчики для кнопок
     const goToPrev = () => {
