@@ -5,7 +5,6 @@ import Chat from "../pages/Chat";
 const ChatsRoutes = () => {
     return (
         <Routes>
-            <Route path="/" element={<Chats />}></Route>
             <Route path=":chatId" element={<Chat />} />
         </Routes>
     );

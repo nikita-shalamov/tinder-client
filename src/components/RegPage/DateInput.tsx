@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
+import { useUserContext } from "../../context/UserContext";
 
 interface FormData {
     birthDate: string;
@@ -16,6 +17,8 @@ const BirthDateInput: React.FC<BirthDateInputProps> = ({ onChange, defaultDate }
     if (defaultDate !== "") {
         defaultDateNormal = dayjs(defaultDate).format("DD.MM.YYYY");
     }
+    const { calculateAge } = useUserContext();
+    const [errorMessage, SetErrorMessage] = useState("");
 
     const {
         control,
@@ -70,15 +73,22 @@ const BirthDateInput: React.FC<BirthDateInputProps> = ({ onChange, defaultDate }
         trigger("birthDate");
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!errors.birthDate && birthDateValue) {
             const [day, month, year] = birthDateValue.split(".");
 
             // Преобразование в формат YYYY-MM-DDTHH:mm:ss.sssZ
             if (day && month && year && day.length === 2 && month.length === 2 && year.length === 4) {
                 const formattedDate = dayjs(`${year}-${month}-${day}`).toISOString();
-                onChange("birthDate", formattedDate);
-                console.log("Дата в нужном формате:", formattedDate);
+                const age = Number(calculateAge(formattedDate));
+                if (age < 18) {
+                    SetErrorMessage("Возраст должен быть от 18 лет");
+                } else if (age > 100) {
+                    SetErrorMessage("Введите корректную дату рождения");
+                } else {
+                    SetErrorMessage("");
+                    onChange("birthDate", formattedDate);
+                }
             }
         }
     }, [birthDateValue, errors.birthDate]);
@@ -95,17 +105,17 @@ const BirthDateInput: React.FC<BirthDateInputProps> = ({ onChange, defaultDate }
                         message: "Введите дату в формате DD.MM.YYYY",
                     },
                 }}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                     <div>
                         <input
                             {...field}
-                            className={`reg-page__input ${fieldState.error ? "input-error" : ""}`}
+                            className={`reg-page__input ${errors.birthDate || !birthDateValue ? "input-error" : ""}`}
                             type="text"
                             placeholder="DD.MM.YYYY"
                             value={field.value || ""}
                             onChange={handleChange}
                         />
-                        {/* {fieldState.error && <div style={{ color: "red" }}>{fieldState.error.message}</div>} */}
+                        {errorMessage && <div className="reg-page__input-error">{errorMessage}</div>}
                     </div>
                 )}
             />

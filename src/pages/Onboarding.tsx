@@ -15,7 +15,7 @@ export default function Onboarding() {
     const paths = ["start-page", "register", "add-photos", "about-me"];
 
     const { progress, increaseProgress, decreaseProgress } = useProgress();
-    const { pushUserData, userData, userPhotos, pushUserPhotos, getMissingFields, missingFields, loading, setLoading, isDataFetched } = useUserContext();
+    const { pushUserData, userData, userPhotos, pushUserPhotos, getMissingFields, missingFields, loading, setLoading, isDataFetched, onChangeUserData } = useUserContext();
     const [alert, setAlert] = useState<string | undefined>(undefined);
 
     const onChangeAlertError = (message: string) => {
@@ -23,13 +23,19 @@ export default function Onboarding() {
         setTimeout(() => setAlert(undefined), 3000);
     };
 
+    const [formErrors, setFormErrors] = useState<string[]>([]);
+
     useEffect(() => {
         getMissingFields();
     }, [userData, userPhotos]);
 
+    useEffect(() => {
+        console.log(formErrors);
+    }, [formErrors]);
+
     const finishProgress = async () => {
-        if (missingFields.length > 0) {
-            onChangeAlertError(`Заполните следующие поля: ${missingFields.join(", ")}`);
+        if (missingFields.length > 0 || formErrors.length > 0) {
+            onChangeAlertError(`Заполните следующие поля: ${[...missingFields, ...formErrors].join(", ")}`);
         } else {
             try {
                 setLoading(true);
@@ -49,7 +55,6 @@ export default function Onboarding() {
     };
 
     useEffect(() => {
-        // Переход на нужную страницу при изменении прогресса
         if (location.pathname === "/onboarding" || location.pathname !== `/onboarding/${paths[progress]}`) {
             navigate(`/onboarding/${paths[progress]}`);
         }
@@ -61,6 +66,10 @@ export default function Onboarding() {
         }
     }, [isDataFetched]);
 
+    useEffect(() => {
+        onChangeUserData({ sex: "man" });
+    }, []);
+
     return (
         <>
             <div className="background">
@@ -69,7 +78,7 @@ export default function Onboarding() {
                     <ProgressBar lines={4} fill={progress} />
                     <Routes>
                         <Route path="start-page" element={<StartPage />} />
-                        <Route path="register" element={<RegPage />} />
+                        <Route path="register" element={<RegPage setFormErrors={setFormErrors} />} />
                         <Route path="add-photos" element={<AddPhotos />} />
                         <Route path="about-me" element={<AboutMe />} />
                     </Routes>

@@ -1,19 +1,18 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Input, Segmented, Select } from "antd";
-import { DatePicker } from "antd";
-import dayjs from "dayjs";
 import { useUserContext } from "../../context/UserContext";
 import { WomanOutlined, ManOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
 import BirthDateInput from "./DateInput";
+import { cities } from "../../constants/cities";
 
-const RegPage = () => {
+interface RegPageProps {
+    setFormErrors: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+const RegPage = ({ setFormErrors }: RegPageProps) => {
     const { userData, onChangeUserData, missingFields } = useUserContext();
 
     const onChangeData = (name: string, value: string) => {
         onChangeUserData({ [name]: value });
-
-        console.log(value, userData);
     };
 
     return (
@@ -31,33 +30,29 @@ const RegPage = () => {
                             Имя
                         </label>
                         <Input
-                            onChange={(e) => onChangeData(e.target.name, e.target.value)}
+                            onChange={(e) => {
+                                {
+                                    onChangeData(e.target.name, e.target.value);
+                                    e.target.value.split("").length > 12 &&
+                                        setFormErrors((prevValue) => {
+                                            return !Array.isArray(prevValue) ? [] : !prevValue.includes("Максимум 12 символов в имени") ? [...prevValue, "Максимум 12 символов в имени"] : prevValue;
+                                        });
+                                }
+                            }}
                             name="name"
                             value={userData.name}
-                            status={missingFields.includes("Имя") ? "error" : ""}
+                            status={missingFields.includes("Имя") || userData.name.split("").length > 12 ? "error" : ""}
                             className="reg-page__input"
                             placeholder="Имя"
                         />
+                        {userData.name && userData.name.split("").length > 12 && <div className="reg-page__input-error">{"Максимум 12 символов"}</div>}
                     </div>
                     <div className="reg-page__field">
                         <label htmlFor="birthDate" className="reg-page__label">
                             Дата рождения
                         </label>
                         {userData && <BirthDateInput defaultDate={userData.birthDate ? userData.birthDate : ""} onChange={onChangeData} />}
-                        {/* {userData && (
-                            // <DatePicker
-                            //     format={dateFormat}
-                            //     onChange={(e) => onChangeData("birthDate", e)}
-                            //     defaultValue={userData.birthDate !== undefined ? dayjs(userData.birthDate) : ""}
-                            //     name="birthDate"
-                            //     className="reg-page__input"
-                            //     placeholder="Дата рождения"
-                            //     status={missingFields.includes("Дата рождения") ? "error" : ""}
-                            // />
-                            
-                        )} */}
                     </div>
-                    {/* // ГОРОД */}
                     <div className="reg-page__field">
                         <label htmlFor="birthDate" className="reg-page__label">
                             Город
@@ -69,20 +64,10 @@ const RegPage = () => {
                             optionFilterProp="label"
                             onChange={(e) => onChangeData("city", e)}
                             value={userData.city}
-                            options={[
-                                {
-                                    value: "perm",
-                                    label: "Пермь",
-                                },
-                                {
-                                    value: "moscow",
-                                    label: "Москва",
-                                },
-                            ]}
+                            options={cities}
                             status={missingFields.includes("Город") ? "error" : ""}
                         />
                     </div>
-                    {/* // ПОЛ */}
                     <div className="reg-page__field">
                         <label htmlFor="birthDate" className="reg-page__label">
                             Пол

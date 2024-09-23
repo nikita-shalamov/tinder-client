@@ -24,6 +24,7 @@
 @import './pages/likes.scss';
 @import '../components/User/user.scss';
 @import '../components/Matches/matches.scss';
+@import '../styles/pages/chat.scss';
 
 body {
     margin: 0;
@@ -78,6 +79,9 @@ button {
     }
     &_min {
         height: calc(100% - 52px);
+    }
+    &_chat {
+        background-color: #f9f9f9;
     }
 }
 

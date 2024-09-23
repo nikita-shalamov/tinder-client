@@ -129,7 +129,8 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     function calculateAge(birthdateString: string) {
         const birthdate = dayjs(birthdateString);
         const today = dayjs();
-        return today.diff(birthdate, "year");
+        const age = today.diff(birthdate, "year");
+        return Number(age);
     }
 
     const takeUserData = async (telegramId: number) => {
@@ -149,7 +150,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const getAllUserData = async (telegramId: number) => {
         try {
             const responseData = await request("/takeUserData", "POST", { telegramId }, {}, token);
-            const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
+            const responsePhotos = await request(`/userPhotos`, "POST", { telegramId }, {}, token);
             const { name, birthDate, sex, city, description, interests } = responseData.message;
             const year = calculateAge(birthDate);
 
@@ -169,7 +170,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const getMinimizeUserData = async (telegramId: number) => {
         const responseData = await request("/takeUserData", "POST", { telegramId }, {}, token);
-        const responsePhotos = await request(`/userPhotos`, "POST", { telegramId });
+        const responsePhotos = await request(`/userPhotos`, "POST", { telegramId }, {}, token);
         const { name, birthDate } = responseData.message;
         const year = calculateAge(birthDate);
 
@@ -179,7 +180,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const pushUserData = async () => {
         try {
-            const response = await request("/pushUserData", "POST", userData);
+            const response = await request("/pushUserData", "POST", userData, {}, token);
             return response;
         } catch (e) {
             console.log("Ошибка при регистрации пользователя", (e as Error).message);
@@ -188,7 +189,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const changeUserData = async () => {
         try {
-            const response = await request("/changeUserData", "POST", { updateData: userData });
+            const response = await request("/changeUserData", "POST", { updateData: userData }, {}, token);
             return response;
         } catch (e) {
             console.log("Ошибка при изменении данных юзера", (e as Error).message);
@@ -214,7 +215,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const takeUserPhotos = async (telegramId: number, set = true) => {
         try {
-            const response = await request(`/userPhotos`, "POST", { telegramId });
+            const response = await request(`/userPhotos`, "POST", { telegramId }, {}, token);
 
             if (set) {
                 setUserPhotos([]);
@@ -262,6 +263,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/upload`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`, // Добавляем токен
                 },
             });
             return response;
@@ -278,6 +280,7 @@ const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`, // Добавляем токен
                 },
                 body: JSON.stringify({
                     telegramId: telegramId,

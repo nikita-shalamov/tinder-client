@@ -41,6 +41,12 @@
         &.input-error {
             border-color:#ff4d4f;
         }
+        &-error {
+            margin-top: 2px;
+            margin-left: 2px;
+            color: #ff4d4f;
+            font-size: 14px;
+        }
         &::placeholder {
             font-size: 17px;
         }

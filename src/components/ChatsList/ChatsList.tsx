@@ -7,33 +7,17 @@ import { format, isToday, isYesterday } from "date-fns";
 
 const ChatsList = () => {
     const [lastMessageWidth, setLastMessageWidth] = useState(window.innerWidth - 185);
-    const { userData, fetchImageAsFile } = useUserContext();
+    const { userData, token } = useUserContext();
     const { request } = useHttp();
     const [chats, setChats] = useState(undefined);
 
-    const updateChatsWithPhotos = async (chats) => {
-        const updatedChats = await Promise.all(
-            chats.map(async (chat) => {
-                const imageFile = await getPhoto(chat.anotherUser.photos);
-                return {
-                    ...chat,
-                    anotherUser: {
-                        ...chat.anotherUser,
-                        photos: imageFile,
-                    },
-                };
-            })
-        );
-        return updatedChats;
-    };
-
     const getChats = async () => {
-        const response = await request(`/getChats/${userData.telegramId}`);
+        const response = await request(`/getChats/${userData.telegramId}`, "GET", null, {}, token);
 
         console.log("response getChats", response.chats);
 
-        const newChats = await updateChatsWithPhotos(response.chats);
-        const chatsWithMessages = newChats.filter((chat) => chat.lastMessage);
+        // const newChats = await updateChatsWithPhotos(response.chats);
+        const chatsWithMessages = response.chats.filter((chat) => chat.lastMessage);
 
         // Сортировка по дате последнего сообщения
         chatsWithMessages.sort((a, b) => new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime());
@@ -41,11 +25,6 @@ const ChatsList = () => {
         console.log("chatsWithMessages", chatsWithMessages);
 
         setChats(chatsWithMessages);
-    };
-
-    const getPhoto = async (photo: string) => {
-        const imageFile = await fetchImageAsFile(`${import.meta.env.VITE_BASE_URL}/download/${photo}`, photo);
-        return imageFile;
     };
 
     useEffect(() => {
@@ -83,7 +62,7 @@ const ChatsList = () => {
                                     <Link key={index} to={`/chats/${item.anotherUser.telegramId}`} className="chat-item__item">
                                         <div className="chat-item__col">
                                             <div className="chat-item__avatar">
-                                                <img src={URL.createObjectURL(item.anotherUser.photos)} alt="" />
+                                                <img src={item.anotherUser.photos} alt="" />
                                             </div>
                                         </div>
                                         <div className="chat-item__col">

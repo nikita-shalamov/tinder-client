@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Carousel } from "antd";
 
 interface surveyCarouselProps {
     photos: File[];
 }
 
-const SurveyCarousel = ({ photos }: surveyCarouselProps) => {
+const SurveyCarousel = React.memo(({ photos }: surveyCarouselProps) => {
     // Создаем реф для компонента Carousel
     const carouselRef = useRef();
 
@@ -25,6 +25,12 @@ const SurveyCarousel = ({ photos }: surveyCarouselProps) => {
         }
     };
 
+    useEffect(() => {
+        if (carouselRef.current) {
+            carouselRef.current.goTo(0, true); // Переход на первый слайд с анимацией
+        }
+    }, [photos]);
+
     return (
         <div style={{ height: "100%" }}>
             <Carousel dotPosition="top" infinite={false} style={{ height: "100%" }} ref={carouselRef} className="survey-picture__carousel">
@@ -40,6 +46,6 @@ const SurveyCarousel = ({ photos }: surveyCarouselProps) => {
             <div className="survey-picture__next-button" onClick={goToNext}></div>
         </div>
     );
-};
+});
 
 export default SurveyCarousel;

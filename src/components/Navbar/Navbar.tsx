@@ -1,10 +1,40 @@
 import { Link, useLocation } from "react-router-dom";
+import { useUserContext } from "../../context/UserContext";
+import { useEffect, useState } from "react";
+import useHttp from "../../hooks/http.hook";
+import { chatService } from "../../service/Chat.service";
+import { likesService } from "../../service/Likes.service";
 
 export default function Navbar() {
     const location = useLocation();
 
-    // Function to check if the current path is active
+    const [countMessages, setCountMessages] = useState(0);
+    const [countLikes, setCountLikes] = useState(0);
+
+    const { getCountUnreadChats } = chatService();
+    const { getCountLikes } = likesService();
+
+    const { userData, token } = useUserContext();
+
     const isActive = (path: string) => location.pathname === path;
+
+    const getCountValues = async () => {
+        try {
+            const responseMessages = await getCountUnreadChats(userData.telegramId, token);
+            const responseLikes = await getCountLikes(userData.telegramId, token);
+
+            setCountMessages(responseMessages);
+            setCountLikes(responseLikes);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    useEffect(() => {
+        if (userData.telegramId && token) {
+            getCountValues();
+        }
+    }, [userData.telegramId, token]);
 
     return (
         <nav className="navbar">
@@ -28,6 +58,7 @@ export default function Navbar() {
                         </svg>
                     </Link>
                     <Link to="/likes" className={`navbar__item ${isActive("/likes") ? "active" : ""}`}>
+                        {countLikes ? <div className="navbar__message-new">{countLikes}</div> : null}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -44,8 +75,7 @@ export default function Navbar() {
                         </svg>
                     </Link>
                     <Link to="/chats" className={`navbar__item ${isActive("/chats") ? "active" : ""}`}>
-                        {/* Uncomment and adjust the div below to display a notification badge */}
-                        {/* <div className="navbar__message-new">123</div> */}
+                        {countMessages ? <div className="navbar__message-new">{countMessages}</div> : null}
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"

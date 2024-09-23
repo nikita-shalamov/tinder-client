@@ -6,6 +6,7 @@ import { useUserContext } from "../../context/UserContext";
 import useHttp from "../../hooks/http.hook";
 import io from "socket.io-client";
 import { Skeleton } from "antd";
+import { Link, useLocation } from "react-router-dom";
 
 const socket = io("https://shalamov-nikita.ru");
 // const socket = io("http://localhost:3000");
@@ -36,7 +37,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [groupedMessages, setGroupedMessages] = useState<GroupedMessage[] | undefined>(undefined);
     const [isFetched, setIsFetched] = useState(undefined);
-    const { userData } = useUserContext();
+    const { userData, token } = useUserContext();
     const { request } = useHttp();
 
     const getFormattedDate = (timestamp: string) => {
@@ -55,8 +56,21 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
         }
     };
 
+    const location = useLocation();
+    const { chatData, getMinimizeUserData } = useUserContext();
+    const [userHeader, setUserHeader] = useState(undefined);
+
+    const getChatData = async () => {
+        const response = await getMinimizeUserData(Number(chatId));
+        setUserHeader(response);
+    };
+
+    useEffect(() => {
+        getChatData();
+    }, []);
+
     const getMessages = async () => {
-        const response = await request(`/getMessages/${room}`);
+        const response = await request(`/getMessages/${room}`, "GET", null, {}, token);
         const messagesList = [];
         response.messages.map((item) => {
             messagesList.push({
@@ -84,7 +98,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
         if (content !== "") {
             setCurrentMessage("");
             socket.emit("message", { room, user: userData.telegramId, message: content, timestamp });
-            await request("/addMessage", "POST", { room, user: userData.telegramId, content, timestamp });
+            await request("/addMessage", "POST", { room, user: userData.telegramId, content, timestamp }, {}, token);
         }
     };
 
@@ -144,8 +158,6 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
 
                     // Filter the messages and update the isRead status
                     return prevMessages.map((item) => {
-                        console.log(item, item.userId);
-                        console.log(item, userData.telegramId);
                         if ((item.isRead === false || item.isRead === undefined) && item.userId !== userData.telegramId) {
                             return { ...item, isRead: true }; // Update isRead status
                         }
@@ -162,8 +174,6 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     }, [room]);
 
     useEffect(() => {
-        console.log(messages);
-
         if (messages) {
             const groupedMessagesList = groupMessagesByDate(messages);
             setGroupedMessages(groupedMessagesList);
@@ -180,8 +190,6 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     }, [isFetched]);
 
     const markMessagesAsRead = async () => {
-        console.log(userData.telegramId, room);
-
         socket.emit("markRead", { user: userData.telegramId, room: room });
         await request(`/markMessagesAsRead/${room}`, "POST", { userId: userData.telegramId });
     };
@@ -204,9 +212,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                 const lastMessageEntry = entries[0];
                 if (lastMessageEntry.isIntersecting) {
                     console.log("Последнее сообщение прочитано.");
-                    console.log(messages);
                     markMessagesAsRead();
-                    // socket.emit("markRead", { user: userData.telegramId, room: room });
                 }
             });
 
@@ -225,6 +231,42 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     return (
         <>
             <div className="background-messages">
+                <>
+                    {!userHeader && (
+                        <div className="chat-header">
+                            <div className="chat-header__wrapper">
+                                <div className="col">
+                                    <Link to="/chats" className="chat-header__back">
+                                        <img src="/images/icons/arrow-left.svg" alt="" />
+                                    </Link>
+                                    <Link to="/profile" className="chat-header__person">
+                                        <div className="chat-header__avatar">
+                                            <Skeleton.Avatar active={true} shape={"circle"} style={{ height: "100%", width: "100%", borderRadius: "100%", overflow: "hidden" }} />
+                                        </div>
+                                        <Skeleton.Input active={true} />
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {userHeader && (
+                        <div className="chat-header">
+                            <div className="chat-header__wrapper">
+                                <div className="col">
+                                    <Link to="/chats" className="chat-header__back">
+                                        <img src="/images/icons/arrow-left.svg" alt="" />
+                                    </Link>
+                                    <Link to={`/user/${chatId}`} state={{ from: location.pathname }} className="chat-header__person">
+                                        <div className="chat-header__avatar">
+                                            <img src={URL.createObjectURL(userHeader.photo)} alt="" />
+                                        </div>
+                                        <div className="chat-header__name">{userHeader.name}</div>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
                 <section className="message-area">
                     {groupedMessages &&
                         groupedMessages.map((group, index) => (
@@ -258,7 +300,7 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
                             <Skeleton.Input active className="received" size={"large"} style={{ width: 120 }} />
                         </>
                     )}
-                    <div ref={messagesEndRef} style={{ marginTop: 20 }} />
+                    <div ref={messagesEndRef} />
                 </section>
                 <footer className="message-input">
                     <input ref={inputRef} type="text" placeholder="Type a message" value={currentMessage} onChange={(e) => setCurrentMessage(e.target.value)} onKeyDown={handleKeyDown} />

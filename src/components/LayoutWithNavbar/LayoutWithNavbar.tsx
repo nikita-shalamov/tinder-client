@@ -33,7 +33,7 @@ const LayoutWithNavbar = () => {
     };
 
     return (
-        <div className="background background_min">
+        <div className={"background background_min"}>
             <div className="background__wrapper">
                 {headerExist(normalizedPathname)}
                 <Outlet />
