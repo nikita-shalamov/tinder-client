@@ -23,9 +23,9 @@ export default function App() {
     const userId = useUserData();
 
     useEffect(() => {
-        const checkAuthToken = async () => {
+        const checkAuthToken = async (user: number) => {
             try {
-                const response = await request("/login", "POST", { telegramId: 999 });
+                const response = await request("/login", "POST", { telegramId: user });
 
                 localStorage.setItem("token", response.token);
                 setToken(response.token);
@@ -38,19 +38,14 @@ export default function App() {
         };
 
         if (userId.id !== undefined) {
-            checkAuthToken();
-        } else {
-            checkAuthToken();
+            checkAuthToken(userId.id);
         }
     }, [userId.id]);
 
     useEffect(() => {
         if (token !== null) {
-            takeUserData(Number(999));
-            takeUserPhotos(Number(999));
-        } else {
-            takeUserData(Number(999));
-            takeUserPhotos(Number(999));
+            takeUserData(Number(userId.id));
+            takeUserPhotos(Number(userId.id));
         }
     }, [token]);
 
