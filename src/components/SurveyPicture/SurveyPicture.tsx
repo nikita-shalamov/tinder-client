@@ -33,6 +33,9 @@ const SurveyPicture = ({ onClick, data, writeButton = false, isLoading }) => {
                 setTimeout(() => {
                     setPosition(0);
                 }, 100);
+            } else if (swipeSpeed > 1.5) {
+                position > 0 ? onClick.onChangeLike() : onClick.onChangeDislike();
+                setPosition(0);
             } else {
                 setPosition(0);
             }
@@ -49,15 +52,6 @@ const SurveyPicture = ({ onClick, data, writeButton = false, isLoading }) => {
         const color = position > 0 ? `rgba(0, 255, 0, ${intensity})` : `rgba(255, 0, 0, ${intensity})`;
         setColor(color);
     }, [position]);
-
-    useEffect(() => {
-        if (swipeSpeed > 1.5) {
-            // Значение скорости, определяющее "быстрый" свайп
-            console.log("Быстрый свайп");
-        } else {
-            console.log("Медленный свайп");
-        }
-    }, [swipeSpeed]);
 
     return (
         <div
