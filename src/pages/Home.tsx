@@ -16,7 +16,6 @@ interface Profile {
 export default function Home() {
     const targetRef = useRef<HTMLDivElement>(null);
     const { getAllUserData, userData, isDataFetched, calculateAge, filters, setFilters } = useUserContext();
-    const [isLoading, setIsLoading] = useState(true);
     const [profileEnd, setProfileEnd] = useState(false);
     const navigate = useNavigate();
     const [showMutualAnimation, setShowMutualAnimation] = useState(false);
@@ -27,19 +26,6 @@ export default function Home() {
     const [profilesCounter, setProfileCounter] = useState(1);
     const [requestActive, setRequestActive] = useState(false);
     const [currentProfile, setCurrentProfile] = useState();
-    // const [dataOfUser, setDataOfUser] = useState<{
-    //     name: string;
-    //     year: number;
-    //     city: string;
-    //     description: string;
-    //     interests: string[];
-    // }>({
-    //     name: "",
-    //     year: 0,
-    //     city: "",
-    //     description: "",
-    //     interests: [],
-    // });
 
     const getUsersData = async (telegramId: number, filters: { lowAge: number; highAge: number; sex: string }, page: number) => {
         setRequestActive(true);
@@ -67,10 +53,6 @@ export default function Home() {
     };
 
     useEffect(() => {
-        console.log("userData", userData);
-    }, [userData]);
-
-    useEffect(() => {
         if (profilesCounter && filters && userData.telegramId) {
             if (profilesCounter === 0) {
                 getUsersData(userData.telegramId, filters, 1);
@@ -78,7 +60,6 @@ export default function Home() {
             } else if ((profilesCounter + 1) % 3 === 0 && profilesCounter !== 0) {
                 getUsersData(userData.telegramId, filters, profilesCounter / 3 + 1);
             } else if (profiles && !profiles[profilesCounter] && !requestActive) {
-                console.log("setProfileEnd(true) 2");
                 setProfileEnd(true);
             }
         }
@@ -97,13 +78,8 @@ export default function Home() {
         });
     };
 
-    useEffect(() => {
-        console.log(profiles, profilesData);
-    }, [profiles, profilesData]);
-
     const onChangeLike = async () => {
-        console.log(userData.telegramId, profiles[profilesCounter], profilesData[profilesCounter]);
-
+        setCounterAndGetProfile();
         const response = await request("/addLike", "POST", { fromUser: userData.telegramId, toUser: profiles[profilesCounter].telegramId });
 
         if (response.mutual) {
@@ -112,8 +88,6 @@ export default function Home() {
                 setShowMutualAnimation(false); // Скрываем анимацию через 3 секунды
             }, 3000);
         }
-
-        setCounterAndGetProfile();
     };
 
     const onChangeDislike = async () => {
@@ -153,7 +127,6 @@ export default function Home() {
 
     useEffect(() => {
         if (!profiles && !requestActive) {
-            console.log("setProfileEnd(true) 3");
             setProfileEnd(true);
         }
     }, [profilesData, profilesCounter, requestActive]);
@@ -186,7 +159,7 @@ export default function Home() {
                         💖 It's a Match! 💖
                     </motion.div>
                 )}
-                <SurveyPicture data={currentProfile ? currentProfile : undefined} onClick={{ scrollToElement, onChangeLike, onChangeDislike }} isLoading={isLoading} />
+                <SurveyPicture data={currentProfile ? currentProfile : undefined} onClick={{ scrollToElement, onChangeLike, onChangeDislike }} />
                 <SurveyInfo data={currentProfile ? currentProfile : undefined} myRef={targetRef} />
             </div>
         </div>
