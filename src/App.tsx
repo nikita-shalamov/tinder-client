@@ -36,16 +36,16 @@ export default function App() {
                 navigate("/onboarding");
             }
         };
-        checkAuthToken(999);
-        // if (userId.id !== undefined) {
-        //     checkAuthToken(userId.id);
-        // }
+
+        if (userId.id !== undefined) {
+            checkAuthToken(userId.id);
+        }
     }, [userId.id]);
 
     useEffect(() => {
         if (token !== null) {
-            takeUserData(Number(999));
-            takeUserPhotos(Number(999));
+            takeUserData(Number(userId.id));
+            takeUserPhotos(Number(userId.id));
         }
     }, [token]);
 

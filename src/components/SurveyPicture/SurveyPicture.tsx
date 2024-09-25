@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
 
-const SurveyPicture = ({ onClick, data, writeButton = false }) => {
+const SurveyPicture = ({ onClick, data, writeButton = false, isLoading }) => {
     const navigate = useNavigate();
     const [position, setPosition] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
@@ -50,7 +50,7 @@ const SurveyPicture = ({ onClick, data, writeButton = false }) => {
 
     return (
         <div
-            {...handlers}
+            {...(!writeButton ? handlers : {})}
             style={{
                 transform: `translateX(${position}px)`,
                 opacity: isVisible ? 1 : 0,
@@ -79,11 +79,11 @@ const SurveyPicture = ({ onClick, data, writeButton = false }) => {
             ) : null}
             <div className="survey-picture__wrapper">
                 <div className="survey-picture__slider">
-                    {!data || !data.photos ? <Skeleton.Image active={true} style={{ height: "100%", width: "100%" }} /> : <SurveyCarousel photos={data.photos ? data.photos : []} />}
+                    {!data || !data.photos || isLoading ? <Skeleton.Image active={true} style={{ height: "100%", width: "100%" }} /> : <SurveyCarousel photos={data.photos ? data.photos : []} />}
                 </div>
                 <div className="survey-picture__light"></div>
                 <div className="survey-picture__name" style={writeButton ? { bottom: "170px" } : {}}>
-                    {!data || !data.name || !data.year ? <Skeleton.Input active={true} size={"large"} /> : `${data.name}, ${data.year}`}
+                    {!data || !data.name ? <Skeleton.Input active={true} size={"large"} /> : `${data.name}, ${data.year}`}
                 </div>
                 {writeButton ? (
                     <button className="button survey-picture__write-button" onClick={() => navigate(`/chats/${data.userId}`)}>

@@ -159,7 +159,7 @@ export default function Home() {
                         💖 It's a Match! 💖
                     </motion.div>
                 )}
-                <SurveyPicture data={currentProfile ? currentProfile : undefined} onClick={{ scrollToElement, onChangeLike, onChangeDislike }} />
+                <SurveyPicture data={currentProfile ? currentProfile : undefined} onClick={{ scrollToElement, onChangeLike, onChangeDislike }} isLoading={false} />
                 <SurveyInfo data={currentProfile ? currentProfile : undefined} myRef={targetRef} />
             </div>
         </div>
