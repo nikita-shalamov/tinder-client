@@ -45,6 +45,9 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
     "@types/config": "^3.3.4",
     "@types/crypto-js": "^4.2.2",
     "@types/date-fns": "^2.6.0",
@@ -64,6 +67,7 @@
     "prettier": "^3.3.3",
     "sass": "^1.77.5",
     "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vite-plugin-babel": "^1.2.0"
   }
 }
