@@ -9,6 +9,7 @@ const SurveyPicture = ({ onClick, data, writeButton = false, isLoading }) => {
     const [position, setPosition] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const [color, setColor] = useState<string>();
+    const [swipeSpeed, setSwipeSpeed] = useState(0); // Для хранения скорости свайпа
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -20,6 +21,7 @@ const SurveyPicture = ({ onClick, data, writeButton = false, isLoading }) => {
     const handlers = useSwipeable({
         onSwiping: (eventData) => {
             setPosition(eventData.deltaX);
+            setSwipeSpeed(eventData.velocity);
         },
         onSwiped: () => {
             const screenThreshold = window.innerWidth * 0.6;
@@ -47,6 +49,15 @@ const SurveyPicture = ({ onClick, data, writeButton = false, isLoading }) => {
         const color = position > 0 ? `rgba(0, 255, 0, ${intensity})` : `rgba(255, 0, 0, ${intensity})`;
         setColor(color);
     }, [position]);
+
+    useEffect(() => {
+        if (swipeSpeed > 1.5) {
+            // Значение скорости, определяющее "быстрый" свайп
+            console.log("Быстрый свайп");
+        } else {
+            console.log("Медленный свайп");
+        }
+    }, [swipeSpeed]);
 
     return (
         <div
