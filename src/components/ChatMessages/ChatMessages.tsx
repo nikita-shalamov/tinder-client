@@ -136,8 +136,6 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
 
             // обработчик сообщений
             socket.on("message", (message) => {
-                console.log(message, userData.telegramId);
-
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     {
@@ -151,14 +149,11 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
             });
 
             socket.on("markRead", (user) => {
-                console.log(user);
-
                 setMessages((prevMessages) => {
-                    if (!prevMessages) return prevMessages; // If messages are undefined, return as is
+                    if (!prevMessages) return prevMessages;
 
-                    // Filter the messages and update the isRead status
                     return prevMessages.map((item) => {
-                        if ((item.isRead === false || item.isRead === undefined) && item.userId !== userData.telegramId) {
+                        if ((item.isRead === false || item.isRead === undefined) && item.userId !== user.user) {
                             return { ...item, isRead: true }; // Update isRead status
                         }
                         return item;
@@ -190,8 +185,8 @@ const ChatMessages = ({ chatId }: ChatMessagesProps) => {
     }, [isFetched]);
 
     const markMessagesAsRead = async () => {
-        socket.emit("markRead", { user: userData.telegramId, room: room });
         await request(`/markMessagesAsRead/${room}`, "POST", { userId: userData.telegramId });
+        socket.emit("markRead", { user: userData.telegramId, room: room });
     };
 
     useEffect(() => {

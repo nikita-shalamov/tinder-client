@@ -39,13 +39,18 @@ export default function App() {
 
         if (userId.id !== undefined) {
             checkAuthToken();
+        } else {
+            checkAuthToken();
         }
     }, [userId.id]);
 
     useEffect(() => {
         if (token !== null) {
-            takeUserData(Number(userId.id));
-            takeUserPhotos(Number(userId.id));
+            takeUserData(Number(999));
+            takeUserPhotos(Number(999));
+        } else {
+            takeUserData(Number(999));
+            takeUserPhotos(Number(999));
         }
     }, [token]);
 
